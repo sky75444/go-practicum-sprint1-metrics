@@ -4,20 +4,16 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/sky75444/go-practicum-sprint1-metrics.git/internal/handler"
-	models "github.com/sky75444/go-practicum-sprint1-metrics.git/internal/model"
+	"github.com/sky75444/go-practicum-sprint1-metrics.git/cmd/server/di"
 )
 
 func main() {
-	var storage = models.NewMemStorage()
-
-	http.HandleFunc("/update/counter/", handler.UpdateCounterHandler(storage))
-	http.HandleFunc("/update/gauge/", handler.UpdateGaugeHandler(storage))
-	http.HandleFunc("/", handler.ErrorHandler)
+	d := di.NewDI()
+	d.Init()
 
 	fmt.Println("Server started at http://localhost:8080")
 
-	if err := http.ListenAndServe(`:8080`, nil); err != nil {
+	if err := http.ListenAndServe(`:8080`, d.Router.Mux); err != nil {
 		panic(err)
 	}
 }

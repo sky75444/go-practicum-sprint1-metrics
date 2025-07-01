@@ -6,20 +6,30 @@ import (
 	"strconv"
 	"strings"
 
-	models "github.com/sky75444/go-practicum-sprint1-metrics.git/internal/model"
+	"github.com/sky75444/go-practicum-sprint1-metrics.git/internal/service"
 )
 
-func UpdateGaugeHandler(m *models.MemStorage) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// if r.Method != http.MethodPost {
-		// 	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		// 	return
-		// }
+type UpdateGaugeHandler struct {
+	updateMetricsService service.UpdateMetricsService
+}
 
-		// if r.Header.Get("Content-Type") != "text/plain" {
-		// 	http.Error(w, "Content-Type not allowed", http.StatusMethodNotAllowed)
-		// 	return
-		// }
+func NewUpdateGaugeHandler(umService service.UpdateMetricsService) *UpdateGaugeHandler {
+	return &UpdateGaugeHandler{
+		updateMetricsService: umService,
+	}
+}
+
+func (g *UpdateGaugeHandler) Handle() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		if r.Header.Get("Content-Type") != "text/plain" {
+			http.Error(w, "Content-Type not allowed", http.StatusMethodNotAllowed)
+			return
+		}
 
 		metricValueStr := r.URL.Path[strings.LastIndex(r.URL.Path, "/")+1:]
 		metricName := r.URL.Path[14:strings.LastIndex(r.URL.Path, "/")]
@@ -35,7 +45,10 @@ func UpdateGaugeHandler(m *models.MemStorage) http.HandlerFunc {
 			return
 		}
 
-		m.UpdateGauge(metricName, value)
+		if err := g.updateMetricsService.UpdateGauge(metricName, value); err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
 
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, "Metric updated")
