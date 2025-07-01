@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/sky75444/go-practicum-sprint1-metrics.git/internal/app"
+	"github.com/sky75444/go-practicum-sprint1-metrics/internal/app"
 )
 
 func main() {

@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/sky75444/go-practicum-sprint1-metrics.git/internal/handler"
+	"github.com/sky75444/go-practicum-sprint1-metrics/internal/handler"
 )
 
 type handlers struct {

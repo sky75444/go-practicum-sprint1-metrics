@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/sky75444/go-practicum-sprint1-metrics.git/internal/service"
-	"github.com/sky75444/go-practicum-sprint1-metrics.git/internal/service/updatemetrics"
+	"github.com/sky75444/go-practicum-sprint1-metrics/internal/service"
+	"github.com/sky75444/go-practicum-sprint1-metrics/internal/service/updatemetrics"
 )
 
 type services struct {

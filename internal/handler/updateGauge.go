@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/sky75444/go-practicum-sprint1-metrics.git/internal/service"
+	"github.com/sky75444/go-practicum-sprint1-metrics/internal/service"
 )
 
 type UpdateGaugeHandler struct {

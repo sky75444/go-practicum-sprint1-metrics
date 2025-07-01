@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/sky75444/go-practicum-sprint1-metrics.git/internal/repository"
-	"github.com/sky75444/go-practicum-sprint1-metrics.git/internal/repository/memstorage"
+	"github.com/sky75444/go-practicum-sprint1-metrics/internal/repository"
+	"github.com/sky75444/go-practicum-sprint1-metrics/internal/repository/memstorage"
 )
 
 type repositories struct {

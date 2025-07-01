@@ -1,7 +1,7 @@
 package updatemetrics
 
 import (
-	"github.com/sky75444/go-practicum-sprint1-metrics.git/internal/repository"
+	"github.com/sky75444/go-practicum-sprint1-metrics/internal/repository"
 )
 
 type updateMetrics struct {
