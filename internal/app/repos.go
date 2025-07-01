@@ -1,4 +1,4 @@
-package di
+package app
 
 import (
 	"github.com/sky75444/go-practicum-sprint1-metrics.git/internal/repository"

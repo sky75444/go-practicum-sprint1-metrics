@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/sky75444/go-practicum-sprint1-metrics.git/cmd/server/di"
+	"github.com/sky75444/go-practicum-sprint1-metrics.git/internal/app"
 )
 
 func main() {
-	d := di.NewDI()
+	d := app.NewDI()
 	d.Init()
 
 	fmt.Println("Server started at http://localhost:8080")

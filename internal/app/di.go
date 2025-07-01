@@ -1,4 +1,4 @@
-package di
+package app
 
 type DI struct {
 	Repositories *repositories
