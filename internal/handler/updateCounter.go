@@ -73,7 +73,7 @@ func (c *UpdateCounterHandler) Handle() http.HandlerFunc {
 			return
 		}
 
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "Metric updated")
+		// w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w)
 	}
 }
