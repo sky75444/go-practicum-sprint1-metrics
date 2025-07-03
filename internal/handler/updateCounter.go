@@ -33,9 +33,26 @@ func (c *UpdateCounterHandler) Handle() http.HandlerFunc {
 
 		metricValueStr := r.URL.Path[strings.LastIndex(r.URL.Path, "/")+1:]
 		metricName := r.URL.Path[16:strings.LastIndex(r.URL.Path, "/")]
+		fmt.Println("********************************************")
+		fmt.Println("********************************************")
+		fmt.Println("********************************************")
+		fmt.Println("МОЙ ВЫВОД")
+		fmt.Println("********************************************")
+		fmt.Println("********************************************")
+		fmt.Println("********************************************")
+		fmt.Println("r.URL.Path")
 		fmt.Println(r.URL.Path)
+		fmt.Println("metricValueStr")
 		fmt.Println(metricValueStr)
+		fmt.Println("r.URL.Path[16:]")
 		fmt.Println(r.URL.Path[16:])
+		fmt.Println("********************************************")
+		fmt.Println("********************************************")
+		fmt.Println("********************************************")
+		fmt.Println("МОЙ ВЫВОД")
+		fmt.Println("********************************************")
+		fmt.Println("********************************************")
+		fmt.Println("********************************************")
 
 		if metricName == "" {
 			http.Error(w, "metric name is required", http.StatusNotFound)
