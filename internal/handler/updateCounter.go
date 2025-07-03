@@ -32,7 +32,8 @@ func (c *UpdateCounterHandler) Handle() http.HandlerFunc {
 		}
 
 		metricValueStr := r.URL.Path[strings.LastIndex(r.URL.Path, "/")+1:]
-		metricName := r.URL.Path[16:strings.LastIndex(r.URL.Path, "/")]
+		urlNameValue := r.URL.Path[16:]
+		metricName := urlNameValue[:strings.LastIndex(r.URL.Path, "/")]
 		fmt.Println("********************************************")
 		fmt.Println("********************************************")
 		fmt.Println("********************************************")
@@ -44,6 +45,8 @@ func (c *UpdateCounterHandler) Handle() http.HandlerFunc {
 		fmt.Println(r.URL.Path)
 		fmt.Println("metricValueStr")
 		fmt.Println(metricValueStr)
+		fmt.Println("urlNameValue")
+		fmt.Println(urlNameValue)
 		fmt.Println("metricName")
 		fmt.Println(metricName)
 		fmt.Println("********************************************")
