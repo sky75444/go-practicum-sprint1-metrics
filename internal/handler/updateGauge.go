@@ -32,7 +32,8 @@ func (g *UpdateGaugeHandler) Handle() http.HandlerFunc {
 		}
 
 		metricValueStr := r.URL.Path[strings.LastIndex(r.URL.Path, "/")+1:]
-		metricName := r.URL.Path[14:strings.LastIndex(r.URL.Path, "/")]
+		urlNameValue := r.URL.Path[14:]
+		metricName := urlNameValue[:strings.LastIndex(r.URL.Path, "/")]
 
 		if metricName == "" {
 			http.Error(w, "metric name is required", http.StatusNotFound)
