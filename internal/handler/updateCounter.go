@@ -45,7 +45,7 @@ func (c *UpdateCounterHandler) Handle() http.HandlerFunc {
 		fmt.Println("metricValueStr")
 		fmt.Println(metricValueStr)
 		fmt.Println("r.URL.Path[16:]")
-		fmt.Println(r.URL.Path[16:])
+		fmt.Println(r.URL.Path[16:strings.LastIndex(r.URL.Path, "/")])
 		fmt.Println("********************************************")
 		fmt.Println("********************************************")
 		fmt.Println("********************************************")
