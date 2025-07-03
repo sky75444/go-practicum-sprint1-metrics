@@ -34,7 +34,7 @@ func (c *UpdateCounterHandler) Handle() http.HandlerFunc {
 
 		metricValueStr := r.URL.Path[strings.LastIndex(r.URL.Path, "/")+1:]
 		urlNameValue := r.URL.Path[16:]
-		metricName := urlNameValue[:strings.LastIndex(r.URL.Path, "/")]
+		metricName := urlNameValue[:strings.LastIndex(urlNameValue, "/")]
 
 		if metricName == "" {
 			w.WriteHeader(http.StatusNotFound)

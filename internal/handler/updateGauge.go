@@ -33,29 +33,7 @@ func (g *UpdateGaugeHandler) Handle() http.HandlerFunc {
 
 		metricValueStr := r.URL.Path[strings.LastIndex(r.URL.Path, "/")+1:]
 		urlNameValue := r.URL.Path[14:]
-		metricName := urlNameValue[:strings.LastIndex(r.URL.Path, "/")]
-		fmt.Println("********************************************")
-		fmt.Println("********************************************")
-		fmt.Println("********************************************")
-		fmt.Println("МОЙ ВЫВОД")
-		fmt.Println("********************************************")
-		fmt.Println("********************************************")
-		fmt.Println("********************************************")
-		fmt.Println("r.URL.Path")
-		fmt.Println(r.URL.Path)
-		fmt.Println("metricValueStr")
-		fmt.Println(metricValueStr)
-		fmt.Println("urlNameValue")
-		fmt.Println(urlNameValue)
-		fmt.Println("metricName")
-		fmt.Println(metricName)
-		fmt.Println("********************************************")
-		fmt.Println("********************************************")
-		fmt.Println("********************************************")
-		fmt.Println("МОЙ ВЫВОД")
-		fmt.Println("********************************************")
-		fmt.Println("********************************************")
-		fmt.Println("********************************************")
+		metricName := urlNameValue[:strings.LastIndex(urlNameValue, "/")]
 
 		if metricName == "" {
 			http.Error(w, "metric name is required", http.StatusNotFound)
