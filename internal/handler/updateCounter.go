@@ -42,6 +42,8 @@ func (c *UpdateCounterHandler) Handle() http.HandlerFunc {
 		fmt.Println("********************************************")
 		fmt.Println("r.URL.Path")
 		fmt.Println(r.URL.Path)
+		fmt.Println("r.URL.Path[strings.LastIndex(r.URL.Path, )]")
+		fmt.Println(r.URL.Path[strings.LastIndex(r.URL.Path, "/")])
 		fmt.Println("metricValueStr")
 		fmt.Println(metricValueStr)
 		fmt.Println("r.URL.Path[16:]")
