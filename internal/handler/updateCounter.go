@@ -21,14 +21,12 @@ func NewUpdateCounterHandler(umService service.UpdateMetricsService) *UpdateCoun
 func (c *UpdateCounterHandler) Handle() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			// http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 
 		if r.Header.Get("Content-Type") != "text/plain" {
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			// http.Error(w, "Content-Type not allowed", http.StatusMethodNotAllowed)
+			http.Error(w, "Content-Type not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 
@@ -37,21 +35,23 @@ func (c *UpdateCounterHandler) Handle() http.HandlerFunc {
 		metricName := urlNameValue[:strings.LastIndex(urlNameValue, "/")]
 
 		if metricName == "" {
-			w.WriteHeader(http.StatusNotFound)
-			// http.Error(w, "metric name is required", http.StatusNotFound)
+			http.Error(w, "metric name is required", http.StatusNotFound)
+			return
+		}
+
+		if metricValueStr == "" {
+			http.Error(w, "metric value is required", http.StatusNotFound)
 			return
 		}
 
 		value, err := strconv.ParseInt(metricValueStr, 10, 64)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			// http.Error(w, "invalid counter value", http.StatusBadRequest)
+			http.Error(w, "invalid counter value", http.StatusBadRequest)
 			return
 		}
 
 		if err := c.updateMetricsService.UpdateCounter(metricName, value); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			// http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 

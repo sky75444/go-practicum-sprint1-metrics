@@ -40,6 +40,11 @@ func (g *UpdateGaugeHandler) Handle() http.HandlerFunc {
 			return
 		}
 
+		if metricValueStr == "" {
+			http.Error(w, "metric value is required", http.StatusNotFound)
+			return
+		}
+
 		value, err := strconv.ParseFloat(metricValueStr, 64)
 		if err != nil {
 			http.Error(w, "invalid gauge value", http.StatusBadRequest)
