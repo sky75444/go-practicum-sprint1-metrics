@@ -30,17 +30,17 @@ func (c *UpdateCounterHandler) Handle() http.HandlerFunc {
 			return
 		}
 
+		if len(r.URL.Path) == strings.LastIndex(r.URL.Path, "/")+1 {
+			http.Error(w, "metric value is required", http.StatusNotFound)
+			return
+		}
+
 		metricValueStr := r.URL.Path[strings.LastIndex(r.URL.Path, "/")+1:]
 		urlNameValue := r.URL.Path[16:]
 		metricName := urlNameValue[:strings.LastIndex(urlNameValue, "/")]
 
 		if metricName == "" {
 			http.Error(w, "metric name is required", http.StatusNotFound)
-			return
-		}
-
-		if metricValueStr == "" {
-			http.Error(w, "metric value is required", http.StatusNotFound)
 			return
 		}
 
