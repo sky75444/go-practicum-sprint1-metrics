@@ -36,7 +36,7 @@ func (c *UpdateCounterHandler) CounterHandle() http.Handler {
 			correctPath = r.URL.String()[:strings.LastIndex(r.URL.String(), "/")]
 		}
 
-		if strings.LastIndex(correctPath, "/") < 0 && len(correctPath) == strings.LastIndex(correctPath, "/") {
+		if strings.LastIndex(correctPath, "/") < 0 || len(correctPath) == strings.LastIndex(correctPath, "/")+1 {
 			http.Error(w, "metric name/value is required", http.StatusNotFound)
 			return
 		}
