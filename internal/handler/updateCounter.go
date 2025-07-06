@@ -47,8 +47,17 @@ func (c *UpdateCounterHandler) CounterHandle() http.Handler {
 		}
 
 		metricName := correctPath[:strings.LastIndex(correctPath, "/")]
+		if metricName == "" {
+			http.Error(w, "metric value is required", http.StatusNotFound)
+			return
+		}
 
 		metricValueStr := correctPath[strings.LastIndex(correctPath, "/")+1:]
+		if metricValueStr == "" {
+			http.Error(w, "metric value is required", http.StatusNotFound)
+			return
+		}
+
 		value, err := strconv.ParseInt(metricValueStr, 10, 64)
 		if err != nil {
 			http.Error(w, "invalid counter value", http.StatusBadRequest)

@@ -56,7 +56,7 @@ func TestGaugeHandle(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPost, tt.reqURL, nil)
 			req.Header.Add("Content-Type", "text/plain")
 			w := httptest.NewRecorder()
-			h := http.Handler(gh.GaugeHandle())
+			h := http.Handler(http.StripPrefix("/update/gauge/", gh.GaugeHandle()))
 
 			h.ServeHTTP(w, req)
 
