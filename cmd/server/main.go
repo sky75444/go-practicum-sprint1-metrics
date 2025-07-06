@@ -13,7 +13,7 @@ func main() {
 
 	fmt.Println("Server started at http://localhost:8080")
 
-	if err := http.ListenAndServe(`:8080`, d.Router.Mux); err != nil {
+	if err := http.ListenAndServe(`localhost:8080`, d.Router.Mux); err != nil {
 		panic(err)
 	}
 }

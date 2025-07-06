@@ -6,7 +6,7 @@ func main() {
 	di := app.NewDI()
 	di.Init()
 
-	if err := di.Services.MetricCollectorAgent.EndlessCollectMetrics(); err != nil {
+	if err := di.Services.MetricCollectorAgent.EndlessCollectMetrics(di.Client); err != nil {
 		panic(err)
 	}
 }

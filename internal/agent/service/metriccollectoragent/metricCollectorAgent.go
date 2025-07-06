@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	PollInterval = 2 * time.Second
+	PollInterval = 2
+	SendInterval = 10
 )
 
 type metricCollectorAgent struct {
@@ -25,17 +26,15 @@ func NewMetricCollectorAgent(repo repository.MetricRepo) *metricCollectorAgent {
 	}
 }
 
-func (mca *metricCollectorAgent) EndlessCollectMetrics() error {
-	client := &http.Client{}
-
+func (mca *metricCollectorAgent) EndlessCollectMetrics(c *http.Client) error {
 	i := 0
 	for {
-		if i == 10 {
-			if err := mca.repo.StoreGaugeMetrics(*mca.mc, client); err != nil {
+		if i == SendInterval {
+			if err := mca.repo.StoreGaugeMetrics(*mca.mc, c); err != nil {
 				fmt.Println(err)
 				return err
 			}
-			if err := mca.repo.StoreCounterMetrics(*mca.mc, client); err != nil {
+			if err := mca.repo.StoreCounterMetrics(*mca.mc, c); err != nil {
 				fmt.Println(err)
 				return err
 			}
@@ -43,7 +42,7 @@ func (mca *metricCollectorAgent) EndlessCollectMetrics() error {
 		}
 
 		mca.mc.Collect()
-		i += 2
-		time.Sleep(PollInterval)
+		i += PollInterval
+		time.Sleep(PollInterval * time.Second)
 	}
 }

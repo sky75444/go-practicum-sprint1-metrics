@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -18,7 +19,7 @@ func NewUpdateCounterHandler(umService service.UpdateMetricsService) *UpdateCoun
 	}
 }
 
-func (c *UpdateCounterHandler) Handle() http.HandlerFunc {
+func (c *UpdateCounterHandler) CounterHandle() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -30,20 +31,20 @@ func (c *UpdateCounterHandler) Handle() http.HandlerFunc {
 			return
 		}
 
+		correctPath := r.URL.Path
 		if len(r.URL.Path) == strings.LastIndex(r.URL.Path, "/")+1 {
-			http.Error(w, "metric value is required", http.StatusNotFound)
+			correctPath = r.URL.Path[:strings.LastIndex(r.URL.Path, "/")]
+		}
+
+		mNameValue := r.URL.Path[16:strings.LastIndex(r.URL.Path, "/")]
+		if strings.LastIndex(mNameValue, "/") < 0 {
+			http.Error(w, "metric name/value is required", http.StatusNotFound)
 			return
 		}
 
-		metricValueStr := r.URL.Path[strings.LastIndex(r.URL.Path, "/")+1:]
-		urlNameValue := r.URL.Path[16:]
-		metricName := urlNameValue[:strings.LastIndex(urlNameValue, "/")]
+		metricName := correctPath[16:strings.LastIndex(correctPath, "/")]
 
-		if metricName == "" {
-			http.Error(w, "metric name is required", http.StatusNotFound)
-			return
-		}
-
+		metricValueStr := correctPath[strings.LastIndex(correctPath, "/")+1:]
 		value, err := strconv.ParseInt(metricValueStr, 10, 64)
 		if err != nil {
 			http.Error(w, "invalid counter value", http.StatusBadRequest)
@@ -55,6 +56,7 @@ func (c *UpdateCounterHandler) Handle() http.HandlerFunc {
 			return
 		}
 
+		fmt.Println("Counter metric updated - " + metricName)
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Metric updated"))
 	}

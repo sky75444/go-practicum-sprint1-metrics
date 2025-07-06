@@ -1,5 +1,7 @@
 package service
 
+import "net/http"
+
 type MetricCollector interface {
-	EndlessCollectMetrics() error
+	EndlessCollectMetrics(c *http.Client) error
 }

@@ -9,9 +9,10 @@ import (
 )
 
 const (
-	MetricGaugeStorageEndpoint = "update/guage"
-	MetricServerHost           = "http://localhost"
-	MetricServerPort           = "8080"
+	MetricGaugeStorageEndpoint   = "update/gauge"
+	MetricCounterStorageEndpoint = "update/counter"
+	MetricServerHost             = "http://localhost"
+	MetricServerPort             = "8080"
 )
 
 type metricStorage struct{}
@@ -21,21 +22,24 @@ func NewMetricStorage() *metricStorage {
 }
 
 func (ms *metricStorage) StoreGaugeMetrics(m model.MetricCollection, c *http.Client) error {
-	metricStorageURL := fmt.Sprintf("%s:%s/%s", MetricServerHost, MetricServerPort, MetricGaugeStorageEndpoint)
-
 	for k, v := range m.GaugeMetrics {
-		endpoint := fmt.Sprintf("%s/%s/%d/", metricStorageURL, k, v)
-
-		req, err := http.NewRequest(http.MethodPost, endpoint, strings.NewReader(""))
+		req, err := createReq(k, MetricGaugeStorageEndpoint, v)
 		if err != nil {
 			return err
 		}
 
 		req.Header.Add("Content-Type", "text/plain")
 
-		if _, err := c.Do(req); err != nil {
-			fmt.Println(err)
+		r, err := c.Do(req)
+
+		fmt.Println(r.Status)
+
+		if err != nil {
 			return err
+		}
+
+		if r.StatusCode != http.StatusOK {
+			return fmt.Errorf("%s", r.Status)
 		}
 	}
 
@@ -43,22 +47,36 @@ func (ms *metricStorage) StoreGaugeMetrics(m model.MetricCollection, c *http.Cli
 }
 
 func (ms *metricStorage) StoreCounterMetrics(m model.MetricCollection, c *http.Client) error {
-	metricStorageURL := fmt.Sprintf("%s:%s/%s", MetricServerHost, MetricServerPort, MetricGaugeStorageEndpoint)
-
 	for k, v := range m.CountMetrics {
-		endpoint := fmt.Sprintf("%s/%s/%d/", metricStorageURL, k, v)
-
-		req, err := http.NewRequest(http.MethodPost, endpoint, strings.NewReader(""))
+		req, err := createReq(k, MetricCounterStorageEndpoint, v)
 		if err != nil {
 			return err
 		}
 
-		req.Header.Add("Content-Type", "text/plain")
-
-		if _, err := c.Do(req); err != nil {
+		r, err := c.Do(req)
+		if err != nil {
 			return err
 		}
+
+		if r.StatusCode != http.StatusOK {
+			return fmt.Errorf("%s", r.Status)
+		}
+
 	}
 
 	return nil
+}
+
+func createReq(memName, memTypeEndpoint string, memValue uint64) (*http.Request, error) {
+	metricStorageURL := fmt.Sprintf("%s:%s/%s", MetricServerHost, MetricServerPort, memTypeEndpoint)
+	endpoint := fmt.Sprintf("%s/%s/%d/", metricStorageURL, memName, memValue)
+
+	req, err := http.NewRequest(http.MethodPost, endpoint, strings.NewReader(""))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", "text/plain")
+
+	return req, nil
 }
