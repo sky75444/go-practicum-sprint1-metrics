@@ -31,9 +31,9 @@ func (g *UpdateGaugeHandler) GaugeHandle() http.HandlerFunc {
 			return
 		}
 
-		correctPath := r.URL.Path
-		if len(r.URL.Path) == strings.LastIndex(r.URL.Path, "/")+1 {
-			correctPath = r.URL.Path[:strings.LastIndex(r.URL.Path, "/")]
+		correctPath := r.URL.String()
+		if len(r.URL.Path) == strings.LastIndex(r.URL.String(), "/")+1 {
+			correctPath = r.URL.String()[:strings.LastIndex(r.URL.String(), "/")]
 		}
 
 		mNameValue := correctPath[14:strings.LastIndex(correctPath, "/")]
