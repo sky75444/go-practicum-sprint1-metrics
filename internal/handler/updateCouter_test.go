@@ -19,7 +19,20 @@ func TestCounterHandle(t *testing.T) {
 		reqURL string
 		want   want
 	}{
-
+		{
+			name:   "correct counter",
+			reqURL: "http://localhost:8080/update/counter/counter1/123/",
+			want: want{
+				code: 200,
+			},
+		},
+		{
+			name:   "invalid counter value",
+			reqURL: "http://localhost:8080/update/counter/counter1/none/",
+			want: want{
+				code: 400,
+			},
+		},
 		{
 			name:   "empty counter value",
 			reqURL: "http://localhost:8080/update/counter/counter1/",
