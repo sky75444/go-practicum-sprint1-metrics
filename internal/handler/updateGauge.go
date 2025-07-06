@@ -19,8 +19,8 @@ func NewUpdateGaugeHandler(umService service.UpdateMetricsService) *UpdateGaugeH
 	}
 }
 
-func (g *UpdateGaugeHandler) GaugeHandle() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (g *UpdateGaugeHandler) GaugeHandle() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
@@ -36,13 +36,12 @@ func (g *UpdateGaugeHandler) GaugeHandle() http.HandlerFunc {
 			correctPath = r.URL.String()[:strings.LastIndex(r.URL.String(), "/")]
 		}
 
-		mNameValue := correctPath[14:strings.LastIndex(correctPath, "/")]
-		if strings.LastIndex(mNameValue, "/") < 0 {
+		if strings.LastIndex(correctPath, "/") < 0 && len(correctPath) == strings.LastIndex(correctPath, "/") {
 			http.Error(w, "metric name/value is required", http.StatusNotFound)
 			return
 		}
 
-		metricName := correctPath[14:strings.LastIndex(correctPath, "/")]
+		metricName := correctPath[:strings.LastIndex(correctPath, "/")]
 
 		metricValueStr := correctPath[strings.LastIndex(correctPath, "/")+1:]
 		value, err := strconv.ParseFloat(metricValueStr, 64)
@@ -59,5 +58,5 @@ func (g *UpdateGaugeHandler) GaugeHandle() http.HandlerFunc {
 		fmt.Println("Gauge metric updated - " + metricName)
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Metric updated"))
-	}
+	})
 }

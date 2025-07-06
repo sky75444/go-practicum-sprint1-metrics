@@ -19,8 +19,8 @@ func NewUpdateCounterHandler(umService service.UpdateMetricsService) *UpdateCoun
 	}
 }
 
-func (c *UpdateCounterHandler) CounterHandle() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (c *UpdateCounterHandler) CounterHandle() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
@@ -36,13 +36,12 @@ func (c *UpdateCounterHandler) CounterHandle() http.HandlerFunc {
 			correctPath = r.URL.String()[:strings.LastIndex(r.URL.String(), "/")]
 		}
 
-		mNameValue := correctPath[16:strings.LastIndex(correctPath, "/")]
-		if strings.LastIndex(mNameValue, "/") < 0 {
+		if strings.LastIndex(correctPath, "/") < 0 && len(correctPath) == strings.LastIndex(correctPath, "/") {
 			http.Error(w, "metric name/value is required", http.StatusNotFound)
 			return
 		}
 
-		metricName := correctPath[16:strings.LastIndex(correctPath, "/")]
+		metricName := correctPath[:strings.LastIndex(correctPath, "/")]
 
 		metricValueStr := correctPath[strings.LastIndex(correctPath, "/")+1:]
 		value, err := strconv.ParseInt(metricValueStr, 10, 64)
@@ -59,5 +58,5 @@ func (c *UpdateCounterHandler) CounterHandle() http.HandlerFunc {
 		fmt.Println("Counter metric updated - " + metricName)
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Metric updated"))
-	}
+	})
 }

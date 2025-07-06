@@ -56,9 +56,9 @@ func TestCounterHandle(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPost, tt.reqURL, nil)
 			req.Header.Add("Content-Type", "text/plain")
 			w := httptest.NewRecorder()
-			h := http.HandlerFunc(ch.CounterHandle())
+			h := http.Handler(ch.CounterHandle())
 
-			h(w, req)
+			h.ServeHTTP(w, req)
 
 			res := w.Result()
 			defer res.Body.Close()
