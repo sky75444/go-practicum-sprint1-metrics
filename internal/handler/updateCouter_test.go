@@ -16,33 +16,33 @@ func TestCounterHandle(t *testing.T) {
 	}
 	tests := []struct {
 		name   string
-		reqUrl string
+		reqURL string
 		want   want
 	}{
 		{
 			name:   "correct counter",
-			reqUrl: "http://localhost:8080/update/counter/counter1/123/",
+			reqURL: "http://localhost:8080/update/counter/counter1/123/",
 			want: want{
 				code: 200,
 			},
 		},
 		{
 			name:   "invalid counter value",
-			reqUrl: "http://localhost:8080/update/counter/counter1/none/",
+			reqURL: "http://localhost:8080/update/counter/counter1/none/",
 			want: want{
 				code: 400,
 			},
 		},
 		{
 			name:   "empty counter value",
-			reqUrl: "http://localhost:8080/update/counter/counter1/",
+			reqURL: "http://localhost:8080/update/counter/counter1/",
 			want: want{
 				code: 404,
 			},
 		},
 		{
 			name:   "empty counter name",
-			reqUrl: "http://localhost:8080/update/counter//123",
+			reqURL: "http://localhost:8080/update/counter//123",
 			want: want{
 				code: 404,
 			},
@@ -53,7 +53,7 @@ func TestCounterHandle(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest(http.MethodPost, tt.reqUrl, nil)
+			req := httptest.NewRequest(http.MethodPost, tt.reqURL, nil)
 			req.Header.Add("Content-Type", "text/plain")
 			w := httptest.NewRecorder()
 			h := http.HandlerFunc(ch.CounterHandle())
@@ -61,6 +61,7 @@ func TestCounterHandle(t *testing.T) {
 			h(w, req)
 
 			res := w.Result()
+			defer res.Body.Close()
 
 			assert.Equal(t, tt.want.code, res.StatusCode)
 		})

@@ -16,33 +16,33 @@ func TestGaugeHandle(t *testing.T) {
 	}
 	tests := []struct {
 		name   string
-		reqUrl string
+		reqURL string
 		want   want
 	}{
 		{
 			name:   "correct gauge",
-			reqUrl: "http://localhost:8080/update/gauge/gauge1/123/",
+			reqURL: "http://localhost:8080/update/gauge/gauge1/123/",
 			want: want{
 				code: 200,
 			},
 		},
 		{
 			name:   "invalid gauge value",
-			reqUrl: "http://localhost:8080/update/gauge/gauge1/none/",
+			reqURL: "http://localhost:8080/update/gauge/gauge1/none/",
 			want: want{
 				code: 400,
 			},
 		},
 		{
 			name:   "empty gauge value",
-			reqUrl: "http://localhost:8080/update/gauge/gauge1/",
+			reqURL: "http://localhost:8080/update/gauge/gauge1/",
 			want: want{
 				code: 404,
 			},
 		},
 		{
 			name:   "empty gauge name",
-			reqUrl: "http://localhost:8080/update/gauge//123",
+			reqURL: "http://localhost:8080/update/gauge//123",
 			want: want{
 				code: 404,
 			},
@@ -53,7 +53,7 @@ func TestGaugeHandle(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest(http.MethodPost, tt.reqUrl, nil)
+			req := httptest.NewRequest(http.MethodPost, tt.reqURL, nil)
 			req.Header.Add("Content-Type", "text/plain")
 			w := httptest.NewRecorder()
 			h := http.HandlerFunc(gh.GaugeHandle())
@@ -61,6 +61,7 @@ func TestGaugeHandle(t *testing.T) {
 			h(w, req)
 
 			res := w.Result()
+			defer res.Body.Close()
 
 			assert.Equal(t, tt.want.code, res.StatusCode)
 		})

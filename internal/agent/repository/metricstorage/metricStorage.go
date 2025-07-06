@@ -31,12 +31,11 @@ func (ms *metricStorage) StoreGaugeMetrics(m model.MetricCollection, c *http.Cli
 		req.Header.Add("Content-Type", "text/plain")
 
 		r, err := c.Do(req)
-
-		fmt.Println(r.Status)
-
 		if err != nil {
 			return err
 		}
+
+		defer r.Body.Close()
 
 		if r.StatusCode != http.StatusOK {
 			return fmt.Errorf("%s", r.Status)
@@ -57,6 +56,8 @@ func (ms *metricStorage) StoreCounterMetrics(m model.MetricCollection, c *http.C
 		if err != nil {
 			return err
 		}
+
+		defer r.Body.Close()
 
 		if r.StatusCode != http.StatusOK {
 			return fmt.Errorf("%s", r.Status)
