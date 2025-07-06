@@ -12,8 +12,8 @@ type router struct {
 
 func NewRouter(handlers *handlers) *router {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/update/counter/", handlers.counterHandler.Handle())
-	mux.HandleFunc("/update/gauge/", handlers.gaugeHandler.Handle())
+	mux.Handle("/update/counter/", http.StripPrefix("/update/counter/", handlers.counterHandler.CounterHandle()))
+	mux.Handle("/update/gauge/", http.StripPrefix("/update/gauge/", handlers.gaugeHandler.GaugeHandle()))
 	mux.HandleFunc("/", handler.ErrorHandler)
 
 	return &router{

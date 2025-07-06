@@ -19,8 +19,8 @@ func NewUpdateGaugeHandler(umService service.UpdateMetricsService) *UpdateGaugeH
 	}
 }
 
-func (g *UpdateGaugeHandler) Handle() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (g *UpdateGaugeHandler) GaugeHandle() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
@@ -31,17 +31,30 @@ func (g *UpdateGaugeHandler) Handle() http.HandlerFunc {
 			return
 		}
 
+		correctPath := r.URL.Path
+		if correctPath == "" {
+			http.Error(w, "metric name/value is required", http.StatusNotFound)
+			return
+		}
+
 		if len(r.URL.Path) == strings.LastIndex(r.URL.Path, "/")+1 {
+			correctPath = r.URL.Path[:strings.LastIndex(r.URL.Path, "/")]
+		}
+
+		if strings.LastIndex(correctPath, "/") < 0 || len(correctPath) == strings.LastIndex(correctPath, "/")+1 {
+			http.Error(w, "metric name/value is required", http.StatusNotFound)
+			return
+		}
+
+		metricName := correctPath[:strings.LastIndex(correctPath, "/")]
+		if metricName == "" {
 			http.Error(w, "metric value is required", http.StatusNotFound)
 			return
 		}
 
-		metricValueStr := r.URL.Path[strings.LastIndex(r.URL.Path, "/")+1:]
-		urlNameValue := r.URL.Path[14:]
-		metricName := urlNameValue[:strings.LastIndex(urlNameValue, "/")]
-
-		if metricName == "" {
-			http.Error(w, "metric name is required", http.StatusNotFound)
+		metricValueStr := correctPath[strings.LastIndex(correctPath, "/")+1:]
+		if metricValueStr == "" {
+			http.Error(w, "metric value is required", http.StatusNotFound)
 			return
 		}
 
@@ -56,7 +69,8 @@ func (g *UpdateGaugeHandler) Handle() http.HandlerFunc {
 			return
 		}
 
+		fmt.Println("Gauge metric updated - " + metricName)
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "Metric updated")
-	}
+		w.Write([]byte("Metric updated"))
+	})
 }
