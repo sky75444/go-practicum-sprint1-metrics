@@ -11,7 +11,7 @@ import (
 func TestCreateReq(t *testing.T) {
 	type want struct {
 		reqMethod   string
-		reqUrl      string
+		reqURL      string
 		contentType string
 	}
 	tests := []struct {
@@ -27,7 +27,7 @@ func TestCreateReq(t *testing.T) {
 			},
 			want: want{
 				reqMethod:   http.MethodPost,
-				reqUrl:      "http://localhost:8080/update/gauge/gauge1/123/",
+				reqURL:      "http://localhost:8080/update/gauge/gauge1/123/",
 				contentType: "text/plain",
 			},
 		},
@@ -38,7 +38,7 @@ func TestCreateReq(t *testing.T) {
 			},
 			want: want{
 				reqMethod:   http.MethodPost,
-				reqUrl:      "http://localhost:8080/update/counter/counter1/123/",
+				reqURL:      "http://localhost:8080/update/counter/counter1/123/",
 				contentType: "text/plain",
 			},
 		},
@@ -50,7 +50,7 @@ func TestCreateReq(t *testing.T) {
 				req, err := createReq(k, MetricGaugeStorageEndpoint, v)
 
 				assert.NoError(t, err)
-				assert.Equal(t, tt.want.reqUrl, req.URL.String())
+				assert.Equal(t, tt.want.reqURL, req.URL.String())
 				assert.Equal(t, tt.want.reqMethod, req.Method)
 				assert.Equal(t, tt.want.contentType, req.Header.Get("Content-Type"))
 			}
@@ -58,7 +58,7 @@ func TestCreateReq(t *testing.T) {
 				req, err := createReq(k, MetricCounterStorageEndpoint, v)
 
 				assert.NoError(t, err)
-				assert.Equal(t, tt.want.reqUrl, req.URL.String())
+				assert.Equal(t, tt.want.reqURL, req.URL.String())
 				assert.Equal(t, tt.want.reqMethod, req.Method)
 				assert.Equal(t, tt.want.contentType, req.Header.Get("Content-Type"))
 			}
