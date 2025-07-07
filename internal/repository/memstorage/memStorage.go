@@ -2,6 +2,7 @@ package memstorage
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	"sync"
 )
@@ -61,12 +62,15 @@ func (m *memStorage) GetGauge(name string) (string, error) {
 
 func (m *memStorage) GetAll() (string, error) {
 	var metrics []string
+
 	for k, v := range m.counters {
 		metrics = append(metrics, fmt.Sprintf("%s - %d", k, v))
 	}
 	for k, v := range m.gauges {
 		metrics = append(metrics, fmt.Sprintf("%s - %f", k, v))
 	}
+
+	sort.Strings(metrics)
 
 	return strings.Join(metrics, "\n"), nil
 }

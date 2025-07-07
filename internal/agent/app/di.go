@@ -1,11 +1,13 @@
 package app
 
-import "net/http"
+import (
+	"github.com/go-resty/resty/v2"
+)
 
 type DI struct {
 	Repositories *repositories
 	Services     *services
-	Client       *http.Client
+	Client       *resty.Client
 }
 
 func NewDI() *DI {
@@ -15,5 +17,5 @@ func NewDI() *DI {
 func (d *DI) Init() {
 	d.Repositories = NewRepositories()
 	d.Services = NewServices(d.Repositories)
-	d.Client = &http.Client{}
+	d.Client = resty.New()
 }
