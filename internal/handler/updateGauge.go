@@ -1,11 +1,12 @@
 package handler
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
+	"github.com/go-chi/chi"
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/service"
 )
 
@@ -19,58 +20,54 @@ func NewUpdateGaugeHandler(umService service.UpdateMetricsService) *UpdateGaugeH
 	}
 }
 
-func (g *UpdateGaugeHandler) GaugeHandle() http.Handler {
+func (g *UpdateGaugeHandler) GaugeHandle() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		gaugeName := strings.ToLower(chi.URLParam(r, "gaugeName"))
+		if gaugeName == "" {
+			http.Error(w, "gauge name is missing", http.StatusNotFound)
 			return
 		}
 
-		if r.Header.Get("Content-Type") != "text/plain" {
-			http.Error(w, "Content-Type not allowed", http.StatusMethodNotAllowed)
+		gaugeValueStr := strings.ToLower(chi.URLParam(r, "gaugeValue"))
+		if gaugeValueStr == "" {
+			http.Error(w, "gauge value is missing", http.StatusNotFound)
 			return
 		}
 
-		correctPath := r.URL.Path
-		if correctPath == "" {
-			http.Error(w, "metric name/value is required", http.StatusNotFound)
-			return
-		}
-
-		if len(r.URL.Path) == strings.LastIndex(r.URL.Path, "/")+1 {
-			correctPath = r.URL.Path[:strings.LastIndex(r.URL.Path, "/")]
-		}
-
-		if strings.LastIndex(correctPath, "/") < 0 || len(correctPath) == strings.LastIndex(correctPath, "/")+1 {
-			http.Error(w, "metric name/value is required", http.StatusNotFound)
-			return
-		}
-
-		metricName := correctPath[:strings.LastIndex(correctPath, "/")]
-		if metricName == "" {
-			http.Error(w, "metric value is required", http.StatusNotFound)
-			return
-		}
-
-		metricValueStr := correctPath[strings.LastIndex(correctPath, "/")+1:]
-		if metricValueStr == "" {
-			http.Error(w, "metric value is required", http.StatusNotFound)
-			return
-		}
-
-		value, err := strconv.ParseFloat(metricValueStr, 64)
+		value, err := strconv.ParseFloat(gaugeValueStr, 64)
 		if err != nil {
 			http.Error(w, "invalid gauge value", http.StatusBadRequest)
 			return
 		}
 
-		if err := g.updateMetricsService.UpdateGauge(metricName, value); err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		if err := g.updateMetricsService.UpdateGauge(gaugeName, value); err != nil {
+			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
 		}
 
-		fmt.Println("Gauge metric updated - " + metricName)
+		log.Println("gauge metric updated - " + gaugeName)
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Metric updated"))
+	})
+}
+
+func (c *UpdateGaugeHandler) GetGaugeHandle() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gaugeName := strings.ToLower(chi.URLParam(r, "gaugeName"))
+		if gaugeName == "" {
+			http.Error(w, "gauge name is missing", http.StatusNotFound)
+			return
+		}
+
+		gaugeValue, err := c.updateMetricsService.GetGauge(gaugeName)
+		if err != nil {
+			log.Println("metric not found" + " - " + gaugeName)
+			http.Error(w, "metric not found", http.StatusNotFound)
+			return
+		}
+
+		log.Printf("%s - %s", gaugeName, gaugeValue)
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(gaugeValue))
 	})
 }

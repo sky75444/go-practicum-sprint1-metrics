@@ -1,11 +1,12 @@
 package handler
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
+	"github.com/go-chi/chi"
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/service"
 )
 
@@ -19,58 +20,54 @@ func NewUpdateCounterHandler(umService service.UpdateMetricsService) *UpdateCoun
 	}
 }
 
-func (c *UpdateCounterHandler) CounterHandle() http.Handler {
+func (c *UpdateCounterHandler) CounterHandle() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		counterName := strings.ToLower(chi.URLParam(r, "counterName"))
+		if counterName == "" {
+			http.Error(w, "counter name is missing", http.StatusNotFound)
 			return
 		}
 
-		if r.Header.Get("Content-Type") != "text/plain" {
-			http.Error(w, "Content-Type not allowed", http.StatusMethodNotAllowed)
+		counterValueStr := strings.ToLower(chi.URLParam(r, "counterValue"))
+		if counterValueStr == "" {
+			http.Error(w, "counter value is missing", http.StatusNotFound)
 			return
 		}
 
-		correctPath := r.URL.Path
-		if correctPath == "" {
-			http.Error(w, "metric name/value is required", http.StatusNotFound)
-			return
-		}
-
-		if len(r.URL.Path) == strings.LastIndex(r.URL.Path, "/")+1 {
-			correctPath = r.URL.Path[:strings.LastIndex(r.URL.Path, "/")]
-		}
-
-		if strings.LastIndex(correctPath, "/") < 0 || len(correctPath) == strings.LastIndex(correctPath, "/")+1 {
-			http.Error(w, "metric name/value is required", http.StatusNotFound)
-			return
-		}
-
-		metricName := correctPath[:strings.LastIndex(correctPath, "/")]
-		if metricName == "" {
-			http.Error(w, "metric value is required", http.StatusNotFound)
-			return
-		}
-
-		metricValueStr := correctPath[strings.LastIndex(correctPath, "/")+1:]
-		if metricValueStr == "" {
-			http.Error(w, "metric value is required", http.StatusNotFound)
-			return
-		}
-
-		value, err := strconv.ParseInt(metricValueStr, 10, 64)
+		value, err := strconv.ParseInt(counterValueStr, 10, 64)
 		if err != nil {
 			http.Error(w, "invalid counter value", http.StatusBadRequest)
 			return
 		}
 
-		if err := c.updateMetricsService.UpdateCounter(metricName, value); err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		if err := c.updateMetricsService.UpdateCounter(counterName, value); err != nil {
+			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
 		}
 
-		fmt.Println("Counter metric updated - " + metricName)
+		log.Println("counter metric updated - " + counterName)
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Metric updated"))
+	})
+}
+
+func (c *UpdateCounterHandler) GetCounterHandle() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		counterName := strings.ToLower(chi.URLParam(r, "counterName"))
+		if counterName == "" {
+			http.Error(w, "counter name is missing", http.StatusNotFound)
+			return
+		}
+
+		counterValue, err := c.updateMetricsService.GetCounter(counterName)
+		if err != nil {
+			log.Println("metric not found" + " - " + counterName)
+			http.Error(w, "metric not found", http.StatusNotFound)
+			return
+		}
+
+		log.Printf("%s - %s", counterName, counterValue)
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(counterValue))
 	})
 }
