@@ -34,8 +34,8 @@ func NewChiMux(
 		})
 
 		r.Route("/gauge", func(r chi.Router) {
-			r.Post("/", errorHandler.BadRequest)
-			r.Get("/", errorHandler.BadRequest)
+			r.Post("/", errorHandler.NotFound)
+			r.Get("/", errorHandler.NotFound)
 			r.Route("/{gaugeName}", func(r chi.Router) {
 				r.Get("/", gaugeHandler.GetGaugeHandle())
 				r.Post("/", errorHandler.NotFound)
