@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -22,29 +23,35 @@ func NewUpdateGaugeHandler(umService service.UpdateMetricsService) *UpdateGaugeH
 
 func (g *UpdateGaugeHandler) GaugeHandle() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("GaugeHandle()    r.URL = " + r.URL.String())
+		fmt.Println("g1")
 		gaugeName := strings.ToLower(chi.URLParam(r, "gaugeName"))
 		if gaugeName == "" {
 			http.Error(w, "gauge name is missing", http.StatusNotFound)
 			return
 		}
 
+		fmt.Println("g2")
 		gaugeValueStr := strings.ToLower(chi.URLParam(r, "gaugeValue"))
 		if gaugeValueStr == "" {
 			http.Error(w, "gauge value is missing", http.StatusNotFound)
 			return
 		}
 
+		fmt.Println("g3")
 		value, err := strconv.ParseFloat(gaugeValueStr, 64)
 		if err != nil {
 			http.Error(w, "invalid gauge value", http.StatusBadRequest)
 			return
 		}
 
+		fmt.Println("g4")
 		if err := g.updateMetricsService.UpdateGauge(gaugeName, value); err != nil {
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
 		}
 
+		fmt.Println("g5")
 		log.Println("gauge metric updated - " + gaugeName)
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Metric updated"))

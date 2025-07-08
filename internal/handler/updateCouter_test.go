@@ -48,6 +48,13 @@ func TestCounterHandle(t *testing.T) {
 				code: 404,
 			},
 		},
+		{
+			name:   "unknown method",
+			reqURL: "/update/unknown/counter1/123",
+			want: want{
+				code: 404,
+			},
+		},
 	}
 
 	ch := NewUpdateCounterHandler(updatemetrics.NewUpdateMetrics(memstorage.NewMemStorage()))
