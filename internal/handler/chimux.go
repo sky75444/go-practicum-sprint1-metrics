@@ -21,8 +21,8 @@ func NewChiMux(
 		r.Get("/", errorHandler.BadRequest)
 
 		r.Route("/counter", func(r chi.Router) {
-			r.Post("/", errorHandler.BadRequest)
-			r.Get("/", errorHandler.BadRequest)
+			r.Post("/", errorHandler.NotFound)
+			r.Get("/", errorHandler.NotFound)
 			r.Route("/{counterName}", func(r chi.Router) {
 				r.Get("/", counterHandler.GetCounterHandle())
 				r.Post("/", errorHandler.NotFound)
