@@ -51,7 +51,7 @@ func (g *UpdateGaugeHandler) GaugeHandle() http.HandlerFunc {
 	})
 }
 
-func (c *UpdateGaugeHandler) GetGaugeHandle() http.HandlerFunc {
+func (g *UpdateGaugeHandler) GetGaugeHandle() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gaugeName := strings.ToLower(chi.URLParam(r, "gaugeName"))
 		if gaugeName == "" {
@@ -59,7 +59,7 @@ func (c *UpdateGaugeHandler) GetGaugeHandle() http.HandlerFunc {
 			return
 		}
 
-		gaugeValue, err := c.updateMetricsService.GetGauge(gaugeName)
+		gaugeValue, err := g.updateMetricsService.GetGauge(gaugeName)
 		if err != nil {
 			log.Println("metric not found" + " - " + gaugeName)
 			http.Error(w, "metric not found", http.StatusNotFound)
