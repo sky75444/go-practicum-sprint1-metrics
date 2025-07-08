@@ -22,7 +22,7 @@ func NewChiMux(
 	r.Route("/update", func(r chi.Router) {
 		r.Post("/", nfh)
 		r.Get("/", nfh)
-		r.NotFound(errorHandler.BadRequest)
+		// r.NotFound(errorHandler.BadRequest)
 
 		r.Route("/counter", func(r chi.Router) {
 			r.Post("/", nfh)
