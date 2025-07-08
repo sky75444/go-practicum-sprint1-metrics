@@ -21,7 +21,9 @@ func NewChiMux(
 	r.Post("/", errorHandler.BadRequest)
 
 	r.Route("/value", func(r chi.Router) {
-		r.Get("/{metricType}/{metricName}/", getHander.GetMetric())
+		r.Route("/{metricType}/{metricName}", func(r chi.Router) {
+			r.Get("/", getHander.GetMetric())
+		})
 	})
 
 	r.Route("/update", func(r chi.Router) {
