@@ -15,19 +15,20 @@ func NewChiMux(
 
 	r.Use(middleware.AllowContentType("text/plain"))
 
-	r.NotFound(errorHandler.NotFound)
+	nfh := r.NotFoundHandler()
 
 	r.Get("/", getAllHander.GetAll())
 	r.Route("/update", func(r chi.Router) {
-		r.Post("/", errorHandler.NotFound)
-		r.Get("/", errorHandler.NotFound)
+		r.Post("/", nfh)
+		r.Get("/", nfh)
+		r.NotFound(errorHandler.BadRequest)
 
 		r.Route("/counter", func(r chi.Router) {
-			r.Post("/", errorHandler.NotFound)
-			r.Get("/", errorHandler.NotFound)
+			r.Post("/", nfh)
+			r.Get("/", nfh)
 			r.Route("/{counterName}", func(r chi.Router) {
 				r.Get("/", counterHandler.GetCounterHandle())
-				r.Post("/", errorHandler.NotFound)
+				r.Post("/", nfh)
 				r.Route("/{counterValue}", func(r chi.Router) {
 					r.Post("/", counterHandler.CounterHandle())
 				})
@@ -36,15 +37,14 @@ func NewChiMux(
 		})
 
 		r.Route("/gauge", func(r chi.Router) {
-			r.Post("/", errorHandler.NotFound)
-			r.Get("/", errorHandler.NotFound)
+			r.Post("/", nfh)
+			r.Get("/", nfh)
 			r.Route("/{gaugeName}", func(r chi.Router) {
 				r.Get("/", gaugeHandler.GetGaugeHandle())
-				r.Post("/", errorHandler.NotFound)
+				r.Post("/", nfh)
 				r.Route("/{gaugeValue}", func(r chi.Router) {
 					r.Post("/", gaugeHandler.GaugeHandle())
 				})
-
 			})
 		})
 	})
