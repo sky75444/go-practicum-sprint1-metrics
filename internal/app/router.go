@@ -19,7 +19,7 @@ func NewRouter(handlers *handlers) *router {
 			handlers.errorHandler,
 			handlers.counterHandler,
 			handlers.gaugeHandler,
-			handlers.getAllHandler,
+			handlers.getHandler,
 		),
 	}
 }

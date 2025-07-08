@@ -2,23 +2,26 @@ package handler
 
 import (
 	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
 )
 
 func NewChiMux(
 	errorHandler *ErrorHandler,
 	counterHandler *UpdateCounterHandler,
 	gaugeHandler *UpdateGaugeHandler,
-	getAllHander *GetAllHandler,
+	getHander *GetHandler,
 ) *chi.Mux {
 	r := chi.NewRouter()
 
-	r.Use(middleware.AllowContentType("text/plain"))
+	// r.Use(middleware.AllowContentType("text/plain"))
 
 	nfh := r.NotFoundHandler()
 
-	r.Get("/", getAllHander.GetAll())
+	r.Get("/", getHander.GetAll())
 	r.Post("/", errorHandler.BadRequest)
+
+	r.Route("/value", func(r chi.Router) {
+		r.Get("/{metricType}/{metricName}/", getHander.GetMetric())
+	})
 
 	r.Route("/update", func(r chi.Router) {
 		r.Post("/", nfh)
@@ -29,10 +32,10 @@ func NewChiMux(
 			r.Post("/", nfh)
 			r.Get("/", nfh)
 			r.Route("/{counterName}", func(r chi.Router) {
-				r.Get("/", counterHandler.GetCounterHandle())
+				r.Get("/", nfh)
 				r.Post("/", nfh)
 				r.Route("/{counterValue}", func(r chi.Router) {
-					r.Post("/", counterHandler.CounterHandle())
+					r.Get("/", counterHandler.CounterHandle())
 				})
 
 			})
@@ -42,10 +45,10 @@ func NewChiMux(
 			r.Post("/", nfh)
 			r.Get("/", nfh)
 			r.Route("/{gaugeName}", func(r chi.Router) {
-				r.Get("/", gaugeHandler.GetGaugeHandle())
+				r.Get("/", nfh)
 				r.Post("/", nfh)
 				r.Route("/{gaugeValue}", func(r chi.Router) {
-					r.Post("/", gaugeHandler.GaugeHandle())
+					r.Get("/", gaugeHandler.GaugeHandle())
 				})
 			})
 		})

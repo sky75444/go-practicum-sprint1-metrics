@@ -51,23 +51,23 @@ func (c *UpdateCounterHandler) CounterHandle() http.HandlerFunc {
 	})
 }
 
-func (c *UpdateCounterHandler) GetCounterHandle() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		counterName := strings.ToLower(chi.URLParam(r, "counterName"))
-		if counterName == "" {
-			http.Error(w, "counter name is missing", http.StatusNotFound)
-			return
-		}
+// func (c *UpdateCounterHandler) GetCounterHandle() http.HandlerFunc {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		counterName := strings.ToLower(chi.URLParam(r, "counterName"))
+// 		if counterName == "" {
+// 			http.Error(w, "counter name is missing", http.StatusNotFound)
+// 			return
+// 		}
 
-		counterValue, err := c.updateMetricsService.GetCounter(counterName)
-		if err != nil {
-			log.Println("metric not found" + " - " + counterName)
-			http.Error(w, "metric not found", http.StatusNotFound)
-			return
-		}
+// 		counterValue, err := c.updateMetricsService.GetCounter(counterName)
+// 		if err != nil {
+// 			log.Println("metric not found" + " - " + counterName)
+// 			http.Error(w, "metric not found", http.StatusNotFound)
+// 			return
+// 		}
 
-		log.Printf("%s - %s", counterName, counterValue)
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(counterValue))
-	})
-}
+// 		log.Printf("%s - %s", counterName, counterValue)
+// 		w.WriteHeader(http.StatusOK)
+// 		w.Write([]byte(counterValue))
+// 	})
+// }

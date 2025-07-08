@@ -8,7 +8,7 @@ type handlers struct {
 	counterHandler *handler.UpdateCounterHandler
 	gaugeHandler   *handler.UpdateGaugeHandler
 	errorHandler   *handler.ErrorHandler
-	getAllHandler  *handler.GetAllHandler
+	getHandler     *handler.GetHandler
 }
 
 func NewHandlers(services *services) *handlers {
@@ -16,6 +16,6 @@ func NewHandlers(services *services) *handlers {
 		counterHandler: handler.NewUpdateCounterHandler(services.UpdateMetricsService),
 		gaugeHandler:   handler.NewUpdateGaugeHandler(services.UpdateMetricsService),
 		errorHandler:   handler.NewErrorHandler(),
-		getAllHandler:  handler.NewGetAllHandler(services.UpdateMetricsService),
+		getHandler:     handler.NewGetHandler(services.UpdateMetricsService),
 	}
 }
