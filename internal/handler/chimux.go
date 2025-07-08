@@ -18,6 +18,7 @@ func NewChiMux(
 	nfh := r.NotFoundHandler()
 
 	r.Get("/", getAllHander.GetAll())
+	r.Post("/", errorHandler.BadRequest)
 	r.Route("/update", func(r chi.Router) {
 		r.Post("/", nfh)
 		r.Get("/", nfh)
