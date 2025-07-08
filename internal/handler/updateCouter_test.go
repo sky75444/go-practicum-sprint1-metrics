@@ -52,7 +52,7 @@ func TestCounterHandle(t *testing.T) {
 			name:   "unknown method",
 			reqURL: "/update/unknown/counter1/123",
 			want: want{
-				code: 404,
+				code: 400,
 			},
 		},
 	}

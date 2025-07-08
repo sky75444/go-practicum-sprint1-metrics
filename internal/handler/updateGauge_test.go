@@ -52,7 +52,7 @@ func TestGaugeHandle(t *testing.T) {
 			name:   "unknown method",
 			reqURL: "/update/unknown/gauge1/123/",
 			want: want{
-				code: 404,
+				code: 400,
 			},
 		},
 	}
