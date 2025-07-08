@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 )
 
 func NewChiMux(
@@ -12,7 +13,7 @@ func NewChiMux(
 ) *chi.Mux {
 	r := chi.NewRouter()
 
-	// r.Use(middleware.AllowContentType("text/plain"))
+	r.Use(middleware.AllowContentType("text/plain"))
 
 	nfh := r.NotFoundHandler()
 
@@ -35,7 +36,7 @@ func NewChiMux(
 				r.Get("/", nfh)
 				r.Post("/", nfh)
 				r.Route("/{counterValue}", func(r chi.Router) {
-					r.Get("/", counterHandler.CounterHandle())
+					r.Post("/", counterHandler.CounterHandle())
 				})
 
 			})
@@ -48,7 +49,7 @@ func NewChiMux(
 				r.Get("/", nfh)
 				r.Post("/", nfh)
 				r.Route("/{gaugeValue}", func(r chi.Router) {
-					r.Get("/", gaugeHandler.GaugeHandle())
+					r.Post("/", gaugeHandler.GaugeHandle())
 				})
 			})
 		})
