@@ -38,6 +38,7 @@ func (mca *metricCollectorAgent) EndlessCollectMetrics(c *resty.Client) error {
 				fmt.Println(err)
 				return err
 			}
+			mca.mc.Clear()
 			i = 0
 		}
 

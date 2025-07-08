@@ -28,31 +28,15 @@ func (ms *metricStorage) StoreGaugeMetrics(m model.MetricCollection, c *resty.Cl
 			return err
 		}
 
-		// req.Header.Add("Content-Type", "text/plain")
-
-		// r, err := c.Do(req)
-		// if err != nil {
-		// 	return err
-		// }
-
 		r, err := req.Send()
 
-		// r, err := c.Do(req)
 		if err != nil {
 			return err
 		}
 
-		// defer r.Body.Close()
-
 		if r.StatusCode() != http.StatusOK {
 			return fmt.Errorf("%s", r.Status())
 		}
-
-		// defer r.Body.Close()
-
-		// if r.StatusCode != http.StatusOK {
-		// 	return fmt.Errorf("%s", r.Status)
-		// }
 	}
 
 	return nil
@@ -67,17 +51,13 @@ func (ms *metricStorage) StoreCounterMetrics(m model.MetricCollection, c *resty.
 
 		r, err := req.Send()
 
-		// r, err := c.Do(req)
 		if err != nil {
 			return err
 		}
 
-		// defer r.Body.Close()
-
 		if r.StatusCode() != http.StatusOK {
 			return fmt.Errorf("%s", r.Status())
 		}
-
 	}
 
 	return nil
@@ -91,15 +71,6 @@ func createReq(memName, memTypeEndpoint string, memValue uint64, c *resty.Client
 	req.Method = http.MethodPost
 	req.Header.Add("Content-Type", "text/plain")
 	req.URL = endpoint
-
-	// resp, err := req.Send()
-
-	// req, err := http.NewRequest(http.MethodPost, endpoint, strings.NewReader(""))
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// req.Header.Add("Content-Type", "text/plain")
 
 	return req, nil
 }
