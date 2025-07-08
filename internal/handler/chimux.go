@@ -15,6 +15,8 @@ func NewChiMux(
 
 	r.Use(middleware.AllowContentType("text/plain"))
 
+	r.NotFound(errorHandler.NotFound)
+
 	r.Get("/", getAllHander.GetAll())
 	r.Route("/update", func(r chi.Router) {
 		r.Post("/", errorHandler.NotFound)
