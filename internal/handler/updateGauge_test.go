@@ -8,6 +8,7 @@ import (
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/repository/memstorage"
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/service/updatemetrics"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGaugeHandle(t *testing.T) {
@@ -21,49 +22,59 @@ func TestGaugeHandle(t *testing.T) {
 	}{
 		{
 			name:   "correct gauge",
-			reqURL: "http://localhost:8080/update/gauge/gauge1/123/",
+			reqURL: "/update/gauge/gauge1/123/",
 			want: want{
 				code: 200,
 			},
 		},
 		{
 			name:   "invalid gauge value",
-			reqURL: "http://localhost:8080/update/gauge/gauge1/none/",
+			reqURL: "/update/gauge/gauge1/none/",
 			want: want{
 				code: 400,
 			},
 		},
 		{
 			name:   "empty gauge value",
-			reqURL: "http://localhost:8080/update/gauge/gauge1/",
+			reqURL: "/update/gauge/gauge1/",
 			want: want{
 				code: 404,
 			},
 		},
 		{
 			name:   "empty gauge name",
-			reqURL: "http://localhost:8080/update/gauge//123",
+			reqURL: "/update/gauge//123",
 			want: want{
 				code: 404,
 			},
 		},
+		{
+			name:   "unknown method",
+			reqURL: "/update/unknown/gauge1/123/",
+			want: want{
+				code: 400,
+			},
+		},
 	}
 
-	gh := NewUpdateGaugeHandler(updatemetrics.NewUpdateMetrics(memstorage.NewMemStorage()))
+	cu := NewUpdateCounterHandler(updatemetrics.NewUpdateMetrics(memstorage.NewMemStorage()))
+	gu := NewUpdateGaugeHandler(updatemetrics.NewUpdateMetrics(memstorage.NewMemStorage()))
+	gh := NewGetHandler(updatemetrics.NewUpdateMetrics(memstorage.NewMemStorage()))
+	eh := NewErrorHandler()
+
+	srv := httptest.NewServer(NewChiMux(eh, cu, gu, gh))
+	defer srv.Close()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest(http.MethodPost, tt.reqURL, nil)
-			req.Header.Add("Content-Type", "text/plain")
-			w := httptest.NewRecorder()
-			h := http.Handler(http.StripPrefix("/update/gauge/", gh.GaugeHandle()))
+			req, err := http.NewRequest(http.MethodPost, srv.URL+tt.reqURL, nil)
+			require.NoError(t, err, "error making HTTP request")
 
-			h.ServeHTTP(w, req)
+			resp, err := srv.Client().Do(req)
+			require.NoError(t, err, "error making HTTP request")
+			defer resp.Body.Close()
 
-			res := w.Result()
-			defer res.Body.Close()
-
-			assert.Equal(t, tt.want.code, res.StatusCode)
+			assert.Equal(t, tt.want.code, resp.StatusCode)
 		})
 	}
 }

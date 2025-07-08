@@ -52,3 +52,13 @@ func (m *MetricCollection) Collect() {
 
 	m.CountMetrics["PollCount"]++
 }
+
+func (m *MetricCollection) Clear() {
+	for k := range m.CountMetrics {
+		m.CountMetrics[k] = 0
+	}
+
+	for k := range m.GaugeMetrics {
+		m.CountMetrics[k] = 0
+	}
+}

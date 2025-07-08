@@ -1,22 +1,30 @@
 package app
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/go-chi/chi"
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/handler"
 )
 
 type router struct {
-	Mux *http.ServeMux
+	R chi.Router
 }
 
 func NewRouter(handlers *handlers) *router {
-	mux := http.NewServeMux()
-	mux.Handle("/update/counter/", http.StripPrefix("/update/counter/", handlers.counterHandler.CounterHandle()))
-	mux.Handle("/update/gauge/", http.StripPrefix("/update/gauge/", handlers.gaugeHandler.GaugeHandle()))
-	mux.HandleFunc("/", handler.ErrorHandler)
-
 	return &router{
-		Mux: mux,
+		R: handler.NewChiMux(
+			handlers.errorHandler,
+			handlers.counterHandler,
+			handlers.gaugeHandler,
+			handlers.getHandler,
+		),
 	}
+}
+
+func (r *router) Start() {
+	fmt.Println("Server started at http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", r.R))
 }

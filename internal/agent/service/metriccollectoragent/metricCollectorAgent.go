@@ -2,9 +2,9 @@ package metriccollectoragent
 
 import (
 	"fmt"
-	"net/http"
 	"time"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/agent/model"
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/agent/repository"
 )
@@ -26,7 +26,7 @@ func NewMetricCollectorAgent(repo repository.MetricRepo) *metricCollectorAgent {
 	}
 }
 
-func (mca *metricCollectorAgent) EndlessCollectMetrics(c *http.Client) error {
+func (mca *metricCollectorAgent) EndlessCollectMetrics(c *resty.Client) error {
 	i := 0
 	for {
 		if i == SendInterval {
@@ -38,10 +38,13 @@ func (mca *metricCollectorAgent) EndlessCollectMetrics(c *http.Client) error {
 				fmt.Println(err)
 				return err
 			}
+			mca.mc.Clear()
 			i = 0
 		}
 
-		mca.mc.Collect()
+		if i%2 == 0 {
+			mca.mc.Collect()
+		}
 		i += PollInterval
 		time.Sleep(PollInterval * time.Second)
 	}

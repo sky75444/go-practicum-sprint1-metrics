@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/agent/model"
 	"github.com/stretchr/testify/assert"
 )
@@ -44,21 +45,23 @@ func TestCreateReq(t *testing.T) {
 		},
 	}
 
+	client := resty.New()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			for k, v := range tt.memCollection.GaugeMetrics {
-				req, err := createReq(k, MetricGaugeStorageEndpoint, v)
+				req, err := createReq(k, MetricGaugeStorageEndpoint, v, client)
 
 				assert.NoError(t, err)
-				assert.Equal(t, tt.want.reqURL, req.URL.String())
+				assert.Equal(t, tt.want.reqURL, req.URL)
 				assert.Equal(t, tt.want.reqMethod, req.Method)
 				assert.Equal(t, tt.want.contentType, req.Header.Get("Content-Type"))
 			}
 			for k, v := range tt.memCollection.CountMetrics {
-				req, err := createReq(k, MetricCounterStorageEndpoint, v)
+				req, err := createReq(k, MetricCounterStorageEndpoint, v, client)
 
 				assert.NoError(t, err)
-				assert.Equal(t, tt.want.reqURL, req.URL.String())
+				assert.Equal(t, tt.want.reqURL, req.URL)
 				assert.Equal(t, tt.want.reqMethod, req.Method)
 				assert.Equal(t, tt.want.contentType, req.Header.Get("Content-Type"))
 			}

@@ -1,7 +1,9 @@
 package service
 
-import "net/http"
+import (
+	"github.com/go-resty/resty/v2"
+)
 
 type MetricCollector interface {
-	EndlessCollectMetrics(c *http.Client) error
+	EndlessCollectMetrics(c *resty.Client) error
 }
