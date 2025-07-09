@@ -29,22 +29,28 @@ func NewChiMux(
 	r.Route("/update", func(r chi.Router) {
 		r.NotFound(errorHandler.BadRequest)
 
-		r.Route("/counter/{counterName}", func(r chi.Router) {
+		r.Route("/counter", func(r chi.Router) {
 			r.Post("/", nfh)
 			r.Get("/", nfh)
-			r.Route("/{counterValue}", func(r chi.Router) {
-				r.Post("/", counterHandler.CounterHandle())
+			r.Route("/{counterName}", func(r chi.Router) {
+				r.Post("/", nfh)
+				r.Get("/", nfh)
+				r.Route("/{counterValue}", func(r chi.Router) {
+					r.Post("/", counterHandler.CounterHandle())
+				})
 			})
-
 		})
 
-		r.Route("/gauge/{gaugeName}", func(r chi.Router) {
+		r.Route("/gauge", func(r chi.Router) {
 			r.Post("/", nfh)
 			r.Get("/", nfh)
-			r.Route("/{gaugeValue}", func(r chi.Router) {
-				r.Post("/", gaugeHandler.GaugeHandle())
+			r.Route("/{gaugeName}", func(r chi.Router) {
+				r.Post("/", nfh)
+				r.Get("/", nfh)
+				r.Route("/{gaugeValue}", func(r chi.Router) {
+					r.Post("/", gaugeHandler.GaugeHandle())
+				})
 			})
-
 		})
 	})
 
