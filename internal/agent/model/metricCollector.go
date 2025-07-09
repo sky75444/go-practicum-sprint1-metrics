@@ -59,6 +59,6 @@ func (m *MetricCollection) Clear() {
 	}
 
 	for k := range m.GaugeMetrics {
-		m.CountMetrics[k] = 0
+		m.GaugeMetrics[k] = 0
 	}
 }
