@@ -69,7 +69,7 @@ func createReq(serverAddr, memName, memTypeEndpoint string, memValue uint64, c *
 	metricStorageURL := fmt.Sprintf("%s/%s", serverAddr, memTypeEndpoint)
 	endpoint := fmt.Sprintf("%s/%s/%d/", metricStorageURL, memName, memValue)
 
-	if endpoint[:3] != "http" {
+	if endpoint[:4] != "http" {
 		endpoint = fmt.Sprintf("http://%s", endpoint)
 	}
 
