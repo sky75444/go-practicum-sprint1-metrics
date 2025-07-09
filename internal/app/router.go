@@ -10,10 +10,11 @@ import (
 )
 
 type router struct {
-	R chi.Router
+	R       chi.Router
+	RunAddr string
 }
 
-func NewRouter(handlers *handlers) *router {
+func NewRouter(runAddr string, handlers *handlers) *router {
 	return &router{
 		R: handler.NewChiMux(
 			handlers.errorHandler,
@@ -21,10 +22,11 @@ func NewRouter(handlers *handlers) *router {
 			handlers.gaugeHandler,
 			handlers.getHandler,
 		),
+		RunAddr: runAddr,
 	}
 }
 
 func (r *router) Start() {
-	fmt.Println("Server started at http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", r.R))
+	fmt.Printf("Server started at %s\n", r.RunAddr)
+	log.Fatal(http.ListenAndServe(r.RunAddr, r.R))
 }

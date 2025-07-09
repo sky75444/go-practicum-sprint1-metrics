@@ -9,27 +9,26 @@ import (
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/agent/repository"
 )
 
-const (
-	PollInterval = 2
-	SendInterval = 10
-)
-
 type metricCollectorAgent struct {
-	mc   *model.MetricCollection
-	repo repository.MetricRepo
+	pollInterval   int
+	reportInterval int
+	mc             *model.MetricCollection
+	repo           repository.MetricRepo
 }
 
-func NewMetricCollectorAgent(repo repository.MetricRepo) *metricCollectorAgent {
+func NewMetricCollectorAgent(pollInterval, reportInterval int, repo repository.MetricRepo) *metricCollectorAgent {
 	return &metricCollectorAgent{
-		repo: repo,
-		mc:   model.NewMetricCollector(),
+		repo:           repo,
+		mc:             model.NewMetricCollector(),
+		pollInterval:   pollInterval,
+		reportInterval: reportInterval,
 	}
 }
 
 func (mca *metricCollectorAgent) EndlessCollectMetrics(c *resty.Client) error {
 	i := 0
 	for {
-		if i == SendInterval {
+		if i == mca.reportInterval {
 			if err := mca.repo.StoreGaugeMetrics(*mca.mc, c); err != nil {
 				fmt.Println(err)
 				return err
@@ -42,10 +41,10 @@ func (mca *metricCollectorAgent) EndlessCollectMetrics(c *resty.Client) error {
 			i = 0
 		}
 
-		if i%2 == 0 {
+		if i%mca.pollInterval == 0 {
 			mca.mc.Collect()
 		}
-		i += PollInterval
-		time.Sleep(PollInterval * time.Second)
+		i += mca.pollInterval
+		time.Sleep(time.Duration(mca.pollInterval) * time.Second)
 	}
 }

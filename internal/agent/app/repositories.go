@@ -9,8 +9,8 @@ type repositories struct {
 	MetricStorage repository.MetricRepo
 }
 
-func NewRepositories() *repositories {
+func NewRepositories(memStorageServerAddr string) *repositories {
 	return &repositories{
-		MetricStorage: metricstorage.NewMetricStorage(),
+		MetricStorage: metricstorage.NewMetricStorage(memStorageServerAddr),
 	}
 }
