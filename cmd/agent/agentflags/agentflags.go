@@ -22,7 +22,7 @@ func NewParsedFlags() *flags {
 		//Если длина 5, это значит что хост не указан. А для агента важно знать хост
 		flags.memServerAddr = fmt.Sprintf("http://localhost%s", flags.memServerAddr)
 	}
-	if flags.memServerAddr[:4] != "http:" {
+	if flags.memServerAddr[:3] != "http" {
 		flags.memServerAddr = fmt.Sprintf("http://%s", flags.memServerAddr)
 	}
 	return &flags
