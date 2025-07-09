@@ -69,6 +69,10 @@ func createReq(serverAddr, memName, memTypeEndpoint string, memValue uint64, c *
 	metricStorageURL := fmt.Sprintf("%s/%s", serverAddr, memTypeEndpoint)
 	endpoint := fmt.Sprintf("%s/%s/%d/", metricStorageURL, memName, memValue)
 
+	if endpoint[:3] != "http" {
+		endpoint = fmt.Sprintf("http://%s", endpoint)
+	}
+
 	req := c.R()
 	req.Method = http.MethodPost
 	req.Header.Add("Content-Type", "text/plain")
