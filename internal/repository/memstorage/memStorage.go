@@ -67,7 +67,7 @@ func (m *memStorage) GetAll() (string, error) {
 		metrics = append(metrics, fmt.Sprintf("%s - %d", k, v))
 	}
 	for k, v := range m.gauges {
-		metrics = append(metrics, fmt.Sprintf("%s - %f", k, v))
+		metrics = append(metrics, fmt.Sprintf("%s - %.3f", k, v))
 	}
 
 	sort.Strings(metrics)
