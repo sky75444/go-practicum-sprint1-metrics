@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	GaugeEndpoint   = "update/gauge"
-	CounterEndpoint = "update/counter"
+	MetricGaugeStorageEndpoint   = "update/gauge"
+	MetricCounterStorageEndpoint = "update/counter"
 )
 
 type metricStorage struct {
@@ -25,7 +25,7 @@ func NewMetricStorage(serverAddr string) *metricStorage {
 
 func (ms *metricStorage) StoreGaugeMetrics(m model.MetricCollection, c *resty.Client) error {
 	for k, v := range m.GaugeMetrics {
-		req, err := createReq(ms.serverAddr, k, GaugeEndpoint, v, c)
+		req, err := createReq(ms.serverAddr, k, MetricGaugeStorageEndpoint, v, c)
 		if err != nil {
 			return err
 		}
@@ -46,7 +46,7 @@ func (ms *metricStorage) StoreGaugeMetrics(m model.MetricCollection, c *resty.Cl
 
 func (ms *metricStorage) StoreCounterMetrics(m model.MetricCollection, c *resty.Client) error {
 	for k, v := range m.CountMetrics {
-		req, err := createReq(ms.serverAddr, k, CounterEndpoint, v, c)
+		req, err := createReq(ms.serverAddr, k, MetricCounterStorageEndpoint, v, c)
 		if err != nil {
 			return err
 		}
