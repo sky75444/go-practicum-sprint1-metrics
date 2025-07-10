@@ -51,7 +51,7 @@ func TestCreateReq(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			for k, v := range tt.memCollection.GaugeMetrics {
-				req, err := createReq(serverAddr, k, MetricGaugeStorageEndpoint, v, client)
+				req, err := createReq(serverAddr, k, GaugeEndpoint, v, client)
 
 				assert.NoError(t, err)
 				assert.Equal(t, tt.want.reqURL, req.URL)
@@ -59,7 +59,7 @@ func TestCreateReq(t *testing.T) {
 				assert.Equal(t, tt.want.contentType, req.Header.Get("Content-Type"))
 			}
 			for k, v := range tt.memCollection.CountMetrics {
-				req, err := createReq(serverAddr, k, MetricCounterStorageEndpoint, v, client)
+				req, err := createReq(serverAddr, k, CounterEndpoint, v, client)
 
 				assert.NoError(t, err)
 				assert.Equal(t, tt.want.reqURL, req.URL)
