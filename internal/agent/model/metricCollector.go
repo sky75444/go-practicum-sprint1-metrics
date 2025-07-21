@@ -10,13 +10,6 @@ type MetricCollection struct {
 	CountMetrics map[string]uint64
 }
 
-func NewMetricCollector() *MetricCollection {
-	return &MetricCollection{
-		GaugeMetrics: make(map[string]uint64),
-		CountMetrics: make(map[string]uint64),
-	}
-}
-
 func (m *MetricCollection) Collect() {
 	var memStats runtime.MemStats
 	runtime.ReadMemStats(&memStats)
