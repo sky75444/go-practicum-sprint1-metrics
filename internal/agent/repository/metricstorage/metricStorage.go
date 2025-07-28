@@ -66,6 +66,11 @@ func (ms *metricStorage) StoreCounterMetrics(m model.MetricCollection, c *resty.
 }
 
 func createReq(serverAddr, memName, memTypeEndpoint string, memValue uint64, c *resty.Client) (*resty.Request, error) {
+	if len(serverAddr) == 5 {
+		//Если длина 5, это значит что хост не указан. А для агента важно знать хост
+		serverAddr = fmt.Sprintf("http://localhost%s", serverAddr)
+	}
+
 	metricStorageURL := fmt.Sprintf("%s/%s", serverAddr, memTypeEndpoint)
 	endpoint := fmt.Sprintf("%s/%s/%d/", metricStorageURL, memName, memValue)
 

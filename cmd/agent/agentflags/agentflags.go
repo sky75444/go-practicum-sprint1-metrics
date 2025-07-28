@@ -2,7 +2,6 @@ package agentflags
 
 import (
 	"flag"
-	"fmt"
 )
 
 type flags struct {
@@ -18,10 +17,6 @@ func NewParsedFlags() *flags {
 	flag.IntVar(&flags.pollInterval, "p", 2, "the interval of collecting metrics")
 	flag.Parse()
 
-	if len(flags.memServerAddr) == 5 {
-		//Если длина 5, это значит что хост не указан. А для агента важно знать хост
-		flags.memServerAddr = fmt.Sprintf("http://localhost%s", flags.memServerAddr)
-	}
 	return &flags
 }
 

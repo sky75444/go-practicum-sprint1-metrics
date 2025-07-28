@@ -9,17 +9,24 @@ import (
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/agent/repository"
 )
 
+const (
+	sleepTime = 1
+)
+
 type metricCollectorAgent struct {
 	pollInterval   int
 	reportInterval int
-	mc             *model.MetricCollection
+	mc             model.MetricCollection
 	repo           repository.MetricRepo
 }
 
 func NewMetricCollectorAgent(pollInterval, reportInterval int, repo repository.MetricRepo) *metricCollectorAgent {
 	return &metricCollectorAgent{
-		repo:           repo,
-		mc:             model.NewMetricCollector(),
+		repo: repo,
+		mc: model.MetricCollection{
+			GaugeMetrics: make(map[string]uint64),
+			CountMetrics: make(map[string]uint64),
+		},
 		pollInterval:   pollInterval,
 		reportInterval: reportInterval,
 	}
@@ -28,12 +35,16 @@ func NewMetricCollectorAgent(pollInterval, reportInterval int, repo repository.M
 func (mca *metricCollectorAgent) EndlessCollectMetrics(c *resty.Client) error {
 	i := 0
 	for {
-		if i == mca.reportInterval {
-			if err := mca.repo.StoreGaugeMetrics(*mca.mc, c); err != nil {
+		if i != 0 && i%mca.pollInterval == 0 {
+			mca.mc.Collect()
+		}
+
+		if i != 0 && i%mca.reportInterval == 0 {
+			if err := mca.repo.StoreGaugeMetrics(mca.mc, c); err != nil {
 				fmt.Println(err)
 				return err
 			}
-			if err := mca.repo.StoreCounterMetrics(*mca.mc, c); err != nil {
+			if err := mca.repo.StoreCounterMetrics(mca.mc, c); err != nil {
 				fmt.Println(err)
 				return err
 			}
@@ -41,10 +52,7 @@ func (mca *metricCollectorAgent) EndlessCollectMetrics(c *resty.Client) error {
 			i = 0
 		}
 
-		if i%mca.pollInterval == 0 {
-			mca.mc.Collect()
-		}
-		i += mca.pollInterval
-		time.Sleep(time.Duration(mca.pollInterval) * time.Second)
+		time.Sleep(time.Duration(sleepTime) * time.Second)
+		i++
 	}
 }
