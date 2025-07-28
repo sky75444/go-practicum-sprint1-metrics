@@ -15,9 +15,9 @@ type flags struct {
 }
 
 type envFlags struct {
-	Address         string        `env:"ADDRESS"`
-	Report_interval time.Duration `env:"REPORT_INTERVAL"`
-	Poll_interval   time.Duration `env:"POLL_INTERVAL"`
+	address        string        `env:"ADDRESS"`
+	reportInterval time.Duration `env:"REPORT_INTERVAL"`
+	pollInterval   time.Duration `env:"POLL_INTERVAL"`
 }
 
 func NewParsedFlags() *flags {
@@ -32,16 +32,16 @@ func NewParsedFlags() *flags {
 		log.Fatal(err)
 	}
 
-	if ef.Address != "" {
-		flags.memServerAddr = ef.Address
+	if ef.address != "" {
+		flags.memServerAddr = ef.address
 	}
 
-	if ef.Poll_interval != 0 {
-		flags.pollInterval = int(ef.Poll_interval)
+	if ef.pollInterval != 0 {
+		flags.pollInterval = int(ef.pollInterval)
 	}
 
-	if ef.Report_interval != 0 {
-		flags.pollInterval = int(ef.Report_interval)
+	if ef.reportInterval != 0 {
+		flags.pollInterval = int(ef.reportInterval)
 	}
 
 	return &flags
