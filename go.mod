@@ -3,6 +3,7 @@ module github.com/sky75444/go-practicum-sprint1-metrics
 go 1.24.4
 
 require (
+	github.com/caarlos0/env v3.5.0+incompatible
 	github.com/go-chi/chi v1.5.5
 	github.com/go-resty/resty/v2 v2.16.5
 	github.com/stretchr/testify v1.10.0
