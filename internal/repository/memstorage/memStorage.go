@@ -57,7 +57,7 @@ func (m *memStorage) GetGauge(name string) (string, error) {
 		return "", fmt.Errorf("metric not found")
 	}
 
-	return fmt.Sprintf("%.3f", v), nil
+	return fmt.Sprintf("%.1f", v), nil
 }
 
 func (m *memStorage) GetAll() (string, error) {
