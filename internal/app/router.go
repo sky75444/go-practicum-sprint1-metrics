@@ -1,12 +1,12 @@
 package app
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 
-	"github.com/go-chi/chi"
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/handler"
+	"github.com/sky75444/go-practicum-sprint1-metrics/internal/logger"
+
+	"github.com/go-chi/chi"
 )
 
 type router struct {
@@ -27,6 +27,15 @@ func NewRouter(runAddr string, handlers *handlers) *router {
 }
 
 func (r *router) Start() {
-	fmt.Printf("Server started at %s\n", r.RunAddr)
-	log.Fatal(http.ListenAndServe(r.RunAddr, r.R))
+	defer logger.ZLog.Sync()
+	sl := logger.ZLog.Sugar()
+
+	sl.Infow(
+		"Starting server",
+		"addr", r.RunAddr,
+	)
+
+	if err := http.ListenAndServe(r.RunAddr, r.R); err != nil {
+		sl.Fatalw(err.Error(), "event", "start server")
+	}
 }

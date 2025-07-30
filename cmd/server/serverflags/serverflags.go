@@ -8,7 +8,8 @@ import (
 )
 
 type flags struct {
-	runAddr string
+	runAddr      string
+	flagLogLevel string
 }
 
 type envFlags struct {
@@ -18,6 +19,7 @@ type envFlags struct {
 func NewParsedFlags() *flags {
 	flags := flags{}
 	flag.StringVar(&flags.runAddr, "a", ":8080", "address and port to run server")
+	flag.StringVar(&flags.flagLogLevel, "l", "info", "log level")
 	flag.Parse()
 
 	var ef envFlags
@@ -34,4 +36,8 @@ func NewParsedFlags() *flags {
 
 func (f *flags) GetRunAddr() string {
 	return f.runAddr
+}
+
+func (f *flags) GetLogLevel() string {
+	return f.flagLogLevel
 }
