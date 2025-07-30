@@ -37,7 +37,7 @@ func NewParsedFlags() *flags {
 	}
 
 	if ef.ReportInterval != 0 {
-		flags.pollInterval = int(ef.ReportInterval.Seconds())
+		flags.reportInterval = int(ef.ReportInterval.Seconds())
 	}
 
 	if ef.PollInterval != 0 {
