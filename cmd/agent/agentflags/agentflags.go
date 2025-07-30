@@ -3,6 +3,7 @@ package agentflags
 import (
 	"flag"
 	"log"
+	"time"
 
 	"github.com/caarlos0/env"
 )
@@ -14,9 +15,9 @@ type flags struct {
 }
 
 type envFlags struct {
-	Address        string `env:"ADDRESS"`
-	ReportInterval int    `env:"REPORT_INTERVAL"`
-	PollInterval   int    `env:"POLL_INTERVAL"`
+	Address        string        `env:"ADDRESS"`
+	ReportInterval time.Duration `env:"REPORT_INTERVAL"`
+	PollInterval   time.Duration `env:"POLL_INTERVAL"`
 }
 
 func NewParsedFlags() *flags {
@@ -36,11 +37,11 @@ func NewParsedFlags() *flags {
 	}
 
 	if ef.ReportInterval != 0 {
-		flags.pollInterval = ef.ReportInterval
+		flags.pollInterval = int(ef.ReportInterval.Seconds())
 	}
 
 	if ef.PollInterval != 0 {
-		flags.pollInterval = ef.PollInterval
+		flags.pollInterval = int(ef.PollInterval.Seconds())
 	}
 
 	return &flags
