@@ -3,6 +3,7 @@ package memstorage
 import (
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -57,7 +58,9 @@ func (m *memStorage) GetGauge(name string) (string, error) {
 		return "", fmt.Errorf("metric not found")
 	}
 
-	return fmt.Sprintf("%.3f", v), nil
+	formattedValue := strconv.FormatFloat(v, 'f', -1, 64)
+
+	return formattedValue, nil
 }
 
 func (m *memStorage) GetAll() (string, error) {
