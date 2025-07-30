@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/sky75444/go-practicum-sprint1-metrics/internal/logger"
 )
 
 func NewChiMux(
@@ -15,40 +16,40 @@ func NewChiMux(
 
 	r.Use(middleware.AllowContentType("text/plain"))
 
-	r.Get("/", getHander.GetAll())
-	r.Post("/", errorHandler.BadRequest)
+	r.Get("/", logger.WithLogging(getHander.GetAll()))
+	r.Post("/", logger.WithLogging(errorHandler.BadRequest))
 
 	nfh := r.NotFoundHandler()
 
 	r.Route("/value", func(r chi.Router) {
 		r.Route("/{metricType}/{metricName}", func(r chi.Router) {
-			r.Get("/", getHander.GetMetric())
+			r.Get("/", logger.WithLogging(getHander.GetMetric()))
 		})
 	})
 
 	r.Route("/update", func(r chi.Router) {
-		r.NotFound(errorHandler.BadRequest)
+		r.NotFound(logger.WithLogging(errorHandler.BadRequest))
 
 		r.Route("/counter", func(r chi.Router) {
-			r.Post("/", nfh)
-			r.Get("/", nfh)
+			r.Post("/", logger.WithLogging(nfh))
+			r.Get("/", logger.WithLogging(nfh))
 			r.Route("/{counterName}", func(r chi.Router) {
-				r.Post("/", nfh)
-				r.Get("/", nfh)
+				r.Post("/", logger.WithLogging(nfh))
+				r.Get("/", logger.WithLogging(nfh))
 				r.Route("/{counterValue}", func(r chi.Router) {
-					r.Post("/", counterHandler.CounterHandle())
+					r.Post("/", logger.WithLogging(counterHandler.CounterHandle()))
 				})
 			})
 		})
 
 		r.Route("/gauge", func(r chi.Router) {
-			r.Post("/", nfh)
-			r.Get("/", nfh)
+			r.Post("/", logger.WithLogging(nfh))
+			r.Get("/", logger.WithLogging(nfh))
 			r.Route("/{gaugeName}", func(r chi.Router) {
-				r.Post("/", nfh)
-				r.Get("/", nfh)
+				r.Post("/", logger.WithLogging(nfh))
+				r.Get("/", logger.WithLogging(nfh))
 				r.Route("/{gaugeValue}", func(r chi.Router) {
-					r.Post("/", gaugeHandler.GaugeHandle())
+					r.Post("/", logger.WithLogging(gaugeHandler.GaugeHandle()))
 				})
 			})
 		})

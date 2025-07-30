@@ -1,11 +1,13 @@
 package serverconfig
 
 type Config struct {
-	RunAddr string
+	RunAddr  string
+	LogLevel string
 }
 
-func NewConfig(runServerAddr string) *Config {
+func NewConfig(runServerAddr string, logLevel string) *Config {
 	return &Config{
-		RunAddr: runServerAddr,
+		RunAddr:  runServerAddr,
+		LogLevel: logLevel,
 	}
 }
