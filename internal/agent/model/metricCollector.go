@@ -5,6 +5,11 @@ import (
 	"runtime"
 )
 
+const (
+	Counter = "counter"
+	Gauge   = "gauge"
+)
+
 type MetricCollection struct {
 	GaugeMetrics map[string]uint64
 	CountMetrics map[string]uint64
@@ -54,4 +59,12 @@ func (m *MetricCollection) Clear() {
 	for k := range m.GaugeMetrics {
 		m.GaugeMetrics[k] = 0
 	}
+}
+
+type Metrics struct {
+	ID    string   `json:"id"`
+	MType string   `json:"type"`
+	Delta *int64   `json:"delta,omitempty"`
+	Value *float64 `json:"value,omitempty"`
+	Hash  string   `json:"hash,omitempty"`
 }

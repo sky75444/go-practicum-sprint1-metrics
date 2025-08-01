@@ -82,3 +82,7 @@ func WithLogging(h http.HandlerFunc) http.HandlerFunc {
 
 	return logFn
 }
+
+func ZError(err error) zap.Field {
+	return zap.Error(err)
+}

@@ -9,6 +9,7 @@ import (
 
 type flags struct {
 	memServerAddr  string
+	flagLogLevel   string
 	reportInterval int
 	pollInterval   int
 }
@@ -24,6 +25,7 @@ func NewParsedFlags() *flags {
 	flag.StringVar(&flags.memServerAddr, "a", ":8080", "address and port of metrics collector server")
 	flag.IntVar(&flags.reportInterval, "r", 10, "the interval of sending to the server")
 	flag.IntVar(&flags.pollInterval, "p", 2, "the interval of collecting metrics")
+	flag.StringVar(&flags.flagLogLevel, "l", "info", "log level")
 	flag.Parse()
 
 	var ef envFlags
@@ -56,4 +58,8 @@ func (f *flags) GetReportInterval() int {
 
 func (f *flags) GetPollInterval() int {
 	return f.pollInterval
+}
+
+func (f *flags) GetLogLevel() string {
+	return f.flagLogLevel
 }

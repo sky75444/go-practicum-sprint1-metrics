@@ -3,7 +3,6 @@ package memstorage
 import (
 	"fmt"
 	"sort"
-	"strconv"
 	"strings"
 	"sync"
 )
@@ -35,32 +34,30 @@ func (m *memStorage) UpdateCounter(name string, value int64) error {
 	return nil
 }
 
-func (m *memStorage) GetCounter(name string) (string, error) {
+func (m *memStorage) GetCounter(name string) (int64, error) {
 	if name == "" {
-		return "", fmt.Errorf("counter name is empty")
+		return 0, fmt.Errorf("counter name is empty")
 	}
 
 	v, exist := m.counters[name]
 	if !exist {
-		return "", fmt.Errorf("metric not found")
+		return 0, fmt.Errorf("metric not found")
 	}
 
-	return fmt.Sprintf("%d", v), nil
+	return v, nil
 }
 
-func (m *memStorage) GetGauge(name string) (string, error) {
+func (m *memStorage) GetGauge(name string) (float64, error) {
 	if name == "" {
-		return "", fmt.Errorf("gauge name is empty")
+		return 0, fmt.Errorf("gauge name is empty")
 	}
 
 	v, exist := m.gauges[name]
 	if !exist {
-		return "", fmt.Errorf("metric not found")
+		return 0, fmt.Errorf("metric not found")
 	}
 
-	formattedValue := strconv.FormatFloat(v, 'f', -1, 64)
-
-	return formattedValue, nil
+	return v, nil
 }
 
 func (m *memStorage) GetAll() (string, error) {

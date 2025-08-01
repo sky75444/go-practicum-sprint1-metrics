@@ -11,10 +11,12 @@ func NewChiMux(
 	counterHandler *UpdateCounterHandler,
 	gaugeHandler *UpdateGaugeHandler,
 	getHander *GetHandler,
+	updateHandler *UpdateHandler,
+	valueHandler *ValueHandler,
 ) *chi.Mux {
 	r := chi.NewRouter()
 
-	r.Use(middleware.AllowContentType("text/plain"))
+	r.Use(middleware.AllowContentType("text/plain", "application/json"))
 
 	r.Get("/", logger.WithLogging(getHander.GetAll()))
 	r.Post("/", logger.WithLogging(errorHandler.BadRequest))
@@ -22,12 +24,15 @@ func NewChiMux(
 	nfh := r.NotFoundHandler()
 
 	r.Route("/value", func(r chi.Router) {
+		r.Post("/", logger.WithLogging(valueHandler.ValueHandle()))
+
 		r.Route("/{metricType}/{metricName}", func(r chi.Router) {
 			r.Get("/", logger.WithLogging(getHander.GetMetric()))
 		})
 	})
 
 	r.Route("/update", func(r chi.Router) {
+		r.Post("/", logger.WithLogging(updateHandler.UpdateHandle()))
 		r.NotFound(logger.WithLogging(errorHandler.BadRequest))
 
 		r.Route("/counter", func(r chi.Router) {
