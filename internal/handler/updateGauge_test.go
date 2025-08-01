@@ -60,9 +60,11 @@ func TestGaugeHandle(t *testing.T) {
 	cu := NewUpdateCounterHandler(updatemetrics.NewUpdateMetrics(memstorage.NewMemStorage()))
 	gu := NewUpdateGaugeHandler(updatemetrics.NewUpdateMetrics(memstorage.NewMemStorage()))
 	gh := NewGetHandler(updatemetrics.NewUpdateMetrics(memstorage.NewMemStorage()))
+	uh := NewUpdateHandler(updatemetrics.NewUpdateMetrics(memstorage.NewMemStorage()))
+	vh := NewValueHandler(updatemetrics.NewUpdateMetrics(memstorage.NewMemStorage()))
 	eh := NewErrorHandler()
 
-	srv := httptest.NewServer(NewChiMux(eh, cu, gu, gh))
+	srv := httptest.NewServer(NewChiMux(eh, cu, gu, gh, uh, vh))
 	defer srv.Close()
 
 	for _, tt := range tests {

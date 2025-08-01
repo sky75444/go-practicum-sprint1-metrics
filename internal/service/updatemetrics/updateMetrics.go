@@ -34,26 +34,26 @@ func (u *updateMetrics) UpdateCounter(metricName string, metricValue int64) erro
 	return nil
 }
 
-func (u *updateMetrics) GetCounter(metricName string) (counterValue string, err error) {
+func (u *updateMetrics) GetCounter(metricName string) (counterValue int64, err error) {
 	if metricName == "" {
-		return "", fmt.Errorf("counter name is empty")
+		return 0, fmt.Errorf("counter name is empty")
 	}
 
 	v, err := u.repo.GetCounter(metricName)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 	return v, nil
 }
 
-func (u *updateMetrics) GetGauge(metricName string) (gaugeValue string, err error) {
+func (u *updateMetrics) GetGauge(metricName string) (gaugeValue float64, err error) {
 	if metricName == "" {
-		return "", fmt.Errorf("gauge name is empty")
+		return 0, fmt.Errorf("gauge name is empty")
 	}
 
 	v, err := u.repo.GetGauge(metricName)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 	return v, nil
 }

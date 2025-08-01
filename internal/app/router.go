@@ -21,6 +21,8 @@ func NewRouter(runAddr string, handlers *handlers) *router {
 			handlers.counterHandler,
 			handlers.gaugeHandler,
 			handlers.getHandler,
+			handlers.updateHandler,
+			handlers.valueHandler,
 		),
 		RunAddr: runAddr,
 	}

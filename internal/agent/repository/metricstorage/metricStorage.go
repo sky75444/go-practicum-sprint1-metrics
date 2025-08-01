@@ -1,6 +1,7 @@
 package metricstorage
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -11,6 +12,7 @@ import (
 const (
 	MetricGaugeStorageEndpoint   = "update/gauge"
 	MetricCounterStorageEndpoint = "update/counter"
+	MetricStorageEndpoint        = "update/"
 )
 
 type metricStorage struct {
@@ -65,6 +67,76 @@ func (ms *metricStorage) StoreCounterMetrics(m model.MetricCollection, c *resty.
 	return nil
 }
 
+func (ms *metricStorage) StoreMetrics(m model.MetricCollection, c *resty.Client) error {
+	for mn, mv := range m.CountMetrics {
+		var m model.Metrics
+
+		m.ID = mn
+		m.MType = model.Counter
+		d := int64(mv)
+		m.Delta = &d
+
+		reqBody, err := json.Marshal(m)
+		if err != nil {
+			return err
+		}
+
+		req, err := createUpdateReqWithBody(ms.serverAddr, reqBody, c)
+		if err != nil {
+			return err
+		}
+
+		if err := send(req); err != nil {
+			return err
+		}
+	}
+
+	for mn, mv := range m.GaugeMetrics {
+		var m model.Metrics
+
+		m.ID = mn
+		m.MType = model.Gauge
+		d := float64(mv)
+		m.Value = &d
+
+		reqBody, err := json.Marshal(m)
+		if err != nil {
+			return err
+		}
+
+		req, err := createUpdateReqWithBody(ms.serverAddr, reqBody, c)
+		if err != nil {
+			return err
+		}
+
+		if err := send(req); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func createUpdateReqWithBody(serverAddr string, body []byte, c *resty.Client) (*resty.Request, error) {
+	if len(serverAddr) == 5 {
+		//Если длина 5, это значит что хост не указан. А для агента важно знать хост
+		serverAddr = fmt.Sprintf("http://localhost%s", serverAddr)
+	}
+
+	metricStorageURL := fmt.Sprintf("%s/%s", serverAddr, MetricStorageEndpoint)
+	if metricStorageURL[:4] != "http" {
+		metricStorageURL = fmt.Sprintf("http://%s", metricStorageURL)
+	}
+
+	req := c.R()
+	req.Method = http.MethodPost
+	req.Header.Add("Content-Type", "application/json")
+	req.URL = metricStorageURL
+	req.Body = body
+
+	return req, nil
+}
+
 func createReq(serverAddr, memName, memTypeEndpoint string, memValue uint64, c *resty.Client) (*resty.Request, error) {
 	if len(serverAddr) == 5 {
 		//Если длина 5, это значит что хост не указан. А для агента важно знать хост
@@ -84,4 +156,17 @@ func createReq(serverAddr, memName, memTypeEndpoint string, memValue uint64, c *
 	req.URL = endpoint
 
 	return req, nil
+}
+
+func send(req *resty.Request) error {
+	r, err := req.Send()
+	if err != nil {
+		return err
+	}
+
+	if r.StatusCode() != http.StatusOK {
+		return fmt.Errorf("%s", r.Status())
+	}
+
+	return nil
 }
