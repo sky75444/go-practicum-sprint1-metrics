@@ -54,6 +54,7 @@ func (u *UpdateHandler) UpdateHandle() http.HandlerFunc {
 			return
 		}
 
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 	})
 }

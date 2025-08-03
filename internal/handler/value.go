@@ -50,7 +50,7 @@ func (u *ValueHandler) ValueHandle() http.HandlerFunc {
 
 			m.Delta = &cVal
 
-			sl.Debugw("%s - %s", m.ID, cVal)
+			sl.Debugw("metricValue", m.ID, cVal)
 		}
 
 		if m.MType == models.Gauge {
@@ -63,7 +63,7 @@ func (u *ValueHandler) ValueHandle() http.HandlerFunc {
 
 			m.Value = &gVal
 
-			sl.Debugw("%s - %s", m.ID, gVal)
+			sl.Debugw("metricValue", m.ID, gVal)
 		}
 
 		w.Header().Set("Content-Type", "application/json")

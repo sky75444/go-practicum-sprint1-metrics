@@ -5,6 +5,8 @@ import (
 	"sort"
 	"strings"
 	"sync"
+
+	"github.com/sky75444/go-practicum-sprint1-metrics/internal/logger"
 )
 
 type memStorage struct {
@@ -23,14 +25,14 @@ func NewMemStorage() *memStorage {
 func (m *memStorage) UpdateGauge(name string, value float64) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	m.gauges[name] = value
+	m.gauges[name] = float64(value)
 	return nil
 }
 
 func (m *memStorage) UpdateCounter(name string, value int64) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	m.counters[name] += value
+	m.counters[name] += int64(value)
 	return nil
 }
 
@@ -48,8 +50,15 @@ func (m *memStorage) GetCounter(name string) (int64, error) {
 }
 
 func (m *memStorage) GetGauge(name string) (float64, error) {
+	defer logger.ZLog.Sync()
+	sl := logger.ZLog.Sugar()
+
 	if name == "" {
 		return 0, fmt.Errorf("gauge name is empty")
+	}
+
+	for mn, mv := range m.gauges {
+		sl.Infow("GAUGE METRIC", mn, mv)
 	}
 
 	v, exist := m.gauges[name]
