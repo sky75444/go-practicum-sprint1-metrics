@@ -76,16 +76,19 @@ func (ms *metricStorage) StoreMetrics(m model.MetricCollection, c *resty.Client)
 		d := int64(mv)
 		m.Delta = &d
 
+		fmt.Println("1")
 		reqBody, err := json.Marshal(m)
 		if err != nil {
 			return err
 		}
 
+		fmt.Println("2")
 		req, err := createUpdateReqWithBody(ms.serverAddr, reqBody, c)
 		if err != nil {
 			return err
 		}
 
+		fmt.Println("3")
 		if err := send(req); err != nil {
 			return err
 		}
@@ -99,16 +102,19 @@ func (ms *metricStorage) StoreMetrics(m model.MetricCollection, c *resty.Client)
 		d := float64(mv)
 		m.Value = &d
 
+		fmt.Println("11")
 		reqBody, err := json.Marshal(m)
 		if err != nil {
 			return err
 		}
 
+		fmt.Println("22")
 		req, err := createUpdateReqWithBody(ms.serverAddr, reqBody, c)
 		if err != nil {
 			return err
 		}
 
+		fmt.Println("33")
 		if err := send(req); err != nil {
 			return err
 		}
