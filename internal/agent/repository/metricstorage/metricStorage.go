@@ -92,6 +92,9 @@ func (ms *metricStorage) StoreMetrics(m model.MetricCollection, c *resty.Client)
 
 		fmt.Println("3")
 		if err := send(req); err != nil {
+			fmt.Println(m)
+			fmt.Println(string(reqBody))
+
 			fmt.Println("3e")
 			return err
 		}
@@ -171,6 +174,10 @@ func createReq(serverAddr, memName, memTypeEndpoint string, memValue uint64, c *
 }
 
 func send(req *resty.Request) error {
+	fmt.Println(req.Method)
+	fmt.Println(req.Header.Get("Content-Type"))
+	fmt.Println(req.URL)
+
 	r, err := req.Send()
 	if err != nil {
 		fmt.Println(err)
