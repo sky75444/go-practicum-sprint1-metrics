@@ -41,11 +41,12 @@ func (u *UpdateHandler) UpdateHandle() http.HandlerFunc {
 		}
 
 		var err error
-		if m.MType == models.Counter {
-			sl.Debugw("UpdateCounter - ", m.ID, m.Delta)
+		if strings.ToLower(m.MType) == models.Counter {
+			sl.Debugw("UpdateCounter", m.ID, m.Delta)
 			err = u.updateMetricsService.UpdateCounter(strings.ToLower(m.ID), *m.Delta)
-		} else {
-			sl.Debugw("UpdateGauge - ", m.ID, m.Value)
+		}
+		if strings.ToLower(m.MType) == models.Gauge {
+			sl.Debugw("UpdateGauge", m.ID, m.Value)
 			err = u.updateMetricsService.UpdateGauge(strings.ToLower(m.ID), *m.Value)
 		}
 
@@ -57,5 +58,6 @@ func (u *UpdateHandler) UpdateHandle() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Metric updated"))
 	})
 }
