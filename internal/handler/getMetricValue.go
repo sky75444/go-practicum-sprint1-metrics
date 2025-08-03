@@ -29,14 +29,14 @@ func (gh *GetHandler) GetMetric() http.HandlerFunc {
 		metricType := strings.ToLower(chi.URLParam(r, "metricType"))
 		if metricType == "" {
 			sl.Errorw("metric type is missing")
-			http.Error(w, "counter name is missing", http.StatusNotFound)
+			http.Error(w, "metric type is missing", http.StatusNotFound)
 			return
 		}
 
 		metricName := strings.ToLower(chi.URLParam(r, "metricName"))
 		if metricName == "" {
-			sl.Errorw("counter name is missing")
-			http.Error(w, "counter name is missing", http.StatusNotFound)
+			sl.Errorw("metric name is missing")
+			http.Error(w, "metric name is missing", http.StatusNotFound)
 			return
 		}
 

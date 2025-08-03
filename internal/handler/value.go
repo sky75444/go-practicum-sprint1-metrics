@@ -2,8 +2,8 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/logger"
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/models"
@@ -40,10 +40,10 @@ func (u *ValueHandler) ValueHandle() http.HandlerFunc {
 			return
 		}
 
-		if m.MType == models.Counter {
-			cVal, err := u.updateMetricsService.GetCounter(m.ID)
+		if strings.ToLower(m.MType) == models.Counter {
+			cVal, err := u.updateMetricsService.GetCounter(strings.ToLower(m.ID))
 			if err != nil {
-				sl.Errorw(fmt.Sprintf("metric not found - %s", m.ID), logger.ZError(err))
+				sl.Errorw("metric not found", m.ID, logger.ZError(err))
 				http.Error(w, "metric not found", http.StatusNotFound)
 				return
 			}
@@ -53,10 +53,10 @@ func (u *ValueHandler) ValueHandle() http.HandlerFunc {
 			sl.Debugw("metricValue", m.ID, cVal)
 		}
 
-		if m.MType == models.Gauge {
-			gVal, err := u.updateMetricsService.GetGauge(m.ID)
+		if strings.ToLower(m.MType) == models.Gauge {
+			gVal, err := u.updateMetricsService.GetGauge(strings.ToLower(m.ID))
 			if err != nil {
-				sl.Errorw(fmt.Sprintf("metric not found - %s", m.ID), logger.ZError(err))
+				sl.Errorw("metric not found", m.ID, logger.ZError(err))
 				http.Error(w, "metric not found", http.StatusNotFound)
 				return
 			}

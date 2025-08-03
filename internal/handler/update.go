@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/logger"
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/models"
@@ -42,10 +43,10 @@ func (u *UpdateHandler) UpdateHandle() http.HandlerFunc {
 		var err error
 		if m.MType == models.Counter {
 			sl.Debugw("UpdateCounter - ", m.ID, m.Delta)
-			err = u.updateMetricsService.UpdateCounter(m.ID, *m.Delta)
+			err = u.updateMetricsService.UpdateCounter(strings.ToLower(m.ID), *m.Delta)
 		} else {
 			sl.Debugw("UpdateGauge - ", m.ID, m.Value)
-			err = u.updateMetricsService.UpdateGauge(m.ID, *m.Value)
+			err = u.updateMetricsService.UpdateGauge(strings.ToLower(m.ID), *m.Value)
 		}
 
 		if err != nil {
