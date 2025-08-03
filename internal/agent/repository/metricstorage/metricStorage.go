@@ -79,17 +79,20 @@ func (ms *metricStorage) StoreMetrics(m model.MetricCollection, c *resty.Client)
 		fmt.Println("1")
 		reqBody, err := json.Marshal(m)
 		if err != nil {
+			fmt.Println("1e")
 			return err
 		}
 
 		fmt.Println("2")
 		req, err := createUpdateReqWithBody(ms.serverAddr, reqBody, c)
 		if err != nil {
+			fmt.Println("2e")
 			return err
 		}
 
 		fmt.Println("3")
 		if err := send(req); err != nil {
+			fmt.Println("3e")
 			return err
 		}
 	}
@@ -105,17 +108,20 @@ func (ms *metricStorage) StoreMetrics(m model.MetricCollection, c *resty.Client)
 		fmt.Println("11")
 		reqBody, err := json.Marshal(m)
 		if err != nil {
+			fmt.Println("11e")
 			return err
 		}
 
 		fmt.Println("22")
 		req, err := createUpdateReqWithBody(ms.serverAddr, reqBody, c)
 		if err != nil {
+			fmt.Println("22e")
 			return err
 		}
 
 		fmt.Println("33")
 		if err := send(req); err != nil {
+			fmt.Println("33e")
 			return err
 		}
 	}
@@ -167,10 +173,12 @@ func createReq(serverAddr, memName, memTypeEndpoint string, memValue uint64, c *
 func send(req *resty.Request) error {
 	r, err := req.Send()
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
 	if r.StatusCode() != http.StatusOK {
+		fmt.Println(r.Status())
 		return fmt.Errorf("%s", r.Status())
 	}
 
