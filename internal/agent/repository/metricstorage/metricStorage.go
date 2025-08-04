@@ -1,7 +1,6 @@
 package metricstorage
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -90,26 +89,26 @@ func (ms *metricStorage) StoreMetrics(m model.MetricCollection, c *resty.Client)
 			return err
 		}
 
-		fmt.Println("3")
-		res, err := req.Send()
-		if err != nil {
-			fmt.Println(err)
-			return err
-		}
-
-		if res.StatusCode() != http.StatusOK {
-			fmt.Println(res.Status())
-			return fmt.Errorf("%s", res.Status())
-		}
-
 		// fmt.Println("3")
-		// if err := send(req); err != nil {
-		// 	fmt.Println(m)
-		// 	// fmt.Println(string(reqBody))
-
-		// 	fmt.Println("3e")
+		// res, err := req.Send()
+		// if err != nil {
+		// 	fmt.Println(err)
 		// 	return err
 		// }
+
+		// if res.StatusCode() != http.StatusOK {
+		// 	fmt.Println(res.Status())
+		// 	return fmt.Errorf("%s", res.Status())
+		// }
+
+		fmt.Println("3")
+		if err := send(req); err != nil {
+			fmt.Println(m)
+			// fmt.Println(string(reqBody))
+
+			fmt.Println("3e")
+			return err
+		}
 	}
 
 	for mn, mv := range m.GaugeMetrics {
@@ -160,11 +159,12 @@ func createUpdateReqWithBody(serverAddr string, body model.Metrics, c *resty.Cli
 	req.SetHeader("Content-Type", "application/json")
 	req.URL = metricStorageURL
 
-	reqBody, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	req.SetBody(&reqBody)
+	// reqBody, err := json.Marshal(body)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// req.SetBody(&reqBody)
+	req.SetBody(&body)
 
 	return req, nil
 }

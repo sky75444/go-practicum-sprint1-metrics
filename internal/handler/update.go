@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -36,23 +37,35 @@ func (u *UpdateHandler) UpdateHandle() http.HandlerFunc {
 		fmt.Println("q2")
 		var m models.Metrics
 
-		fmt.Println("q3")
-		dec := json.NewDecoder(r.Body)
-		if err := dec.Decode(&m); err != nil {
-			sl.Errorw("cannot decode request JSON body", logger.ZError(err))
+		var buf bytes.Buffer
+		if _, err := buf.ReadFrom(r.Body); err != nil {
+			sl.Errorw("unmarshall error", logger.ZError(err))
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
 		}
 
+		if err := json.Unmarshal(buf.Bytes(), &m); err != nil {
+			sl.Errorw("unmarshall error", logger.ZError(err))
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		// dec := json.NewDecoder(r.Body)
+		// if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
+		// 	sl.Errorw("cannot decode request JSON body", logger.ZError(err))
+		// 	http.Error(w, "internal server error", http.StatusInternalServerError)
+		// 	return
+		// }
+
 		fmt.Println("q4")
 		var err error
 		if strings.ToLower(m.MType) == models.Counter {
-			fmt.Println("q4")
+			fmt.Println("q4.1")
 			sl.Debugw("UpdateCounter", m.ID, m.Delta)
 			err = u.updateMetricsService.UpdateCounter(strings.ToLower(m.ID), *m.Delta)
 		}
 		if strings.ToLower(m.MType) == models.Gauge {
-			fmt.Println("q4.1")
+			fmt.Println("q4.2")
 			sl.Debugw("UpdateGauge", m.ID, m.Value)
 			err = u.updateMetricsService.UpdateGauge(strings.ToLower(m.ID), *m.Value)
 		}
