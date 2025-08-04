@@ -76,38 +76,12 @@ func (ms *metricStorage) StoreMetrics(m model.MetricCollection, c *resty.Client)
 		d := int64(mv)
 		m.Delta = &d
 
-		// fmt.Println("1")
-		// reqBody, err := json.Marshal(m)
-		// if err != nil {
-		// 	fmt.Println("1e")
-		// 	return err
-		// }
-
-		fmt.Println("2")
 		req, err := createUpdateReqWithBody(ms.serverAddr, m, c)
 		if err != nil {
-			fmt.Println("2e")
 			return err
 		}
 
-		// fmt.Println("3")
-		// res, err := req.Send()
-		// if err != nil {
-		// 	fmt.Println(err)
-		// 	return err
-		// }
-
-		// if res.StatusCode() != http.StatusOK {
-		// 	fmt.Println(res.Status())
-		// 	return fmt.Errorf("%s", res.Status())
-		// }
-
-		fmt.Println("3")
 		if err := send(req); err != nil {
-			fmt.Println(m)
-			// fmt.Println(string(reqBody))
-
-			fmt.Println("3e")
 			return err
 		}
 	}
@@ -120,23 +94,12 @@ func (ms *metricStorage) StoreMetrics(m model.MetricCollection, c *resty.Client)
 		d := float64(mv)
 		m.Value = &d
 
-		// fmt.Println("11")
-		// reqBody, err := json.Marshal(m)
-		// if err != nil {
-		// 	fmt.Println("11e")
-		// 	return err
-		// }
-
-		fmt.Println("22")
 		req, err := createUpdateReqWithBody(ms.serverAddr, m, c)
 		if err != nil {
-			fmt.Println("22e")
 			return err
 		}
 
-		fmt.Println("33")
 		if err := send(req); err != nil {
-			fmt.Println("33e")
 			return err
 		}
 	}
@@ -159,12 +122,6 @@ func createUpdateReqWithBody(serverAddr string, body model.Metrics, c *resty.Cli
 	req.Method = http.MethodPost
 	req.SetHeader("Content-Type", "application/json")
 	req.URL = metricStorageURL
-
-	// reqBody, err := json.Marshal(body)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// req.SetBody(&reqBody)
 	req.SetBody(&body)
 
 	return req, nil
