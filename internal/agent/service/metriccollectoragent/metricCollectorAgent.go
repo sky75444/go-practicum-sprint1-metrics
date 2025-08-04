@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/sky75444/go-practicum-sprint1-metrics/internal/agent/alogger"
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/agent/model"
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/agent/repository"
 )
@@ -33,26 +34,60 @@ func NewMetricCollectorAgent(pollInterval, reportInterval int, repo repository.M
 }
 
 func (mca *metricCollectorAgent) EndlessCollectMetrics(c *resty.Client) error {
-	i := 0
+	defer alogger.AZLog.Sync()
+	sl := alogger.AZLog.Sugar()
+
+	j := 0
 	for {
-		if i != 0 && i%mca.pollInterval == 0 {
-			mca.mc.Collect()
+
+		if j == 10 {
+			sl.Errorw("internal error", alogger.ZError(fmt.Errorf("server not allowed")))
+			return fmt.Errorf("server not allowed")
 		}
 
-		if i != 0 && i%mca.reportInterval == 0 {
-			if err := mca.repo.StoreGaugeMetrics(mca.mc, c); err != nil {
-				fmt.Println(err)
-				return err
-			}
-			if err := mca.repo.StoreCounterMetrics(mca.mc, c); err != nil {
-				fmt.Println(err)
-				return err
-			}
-			mca.mc.Clear()
-			i = 0
+		sl.Infow("health checking server")
+		if ok, _ := mca.repo.ServerHealthCheck(c); ok {
+			sl.Infow("server is healthy")
+			break
 		}
 
-		time.Sleep(time.Duration(sleepTime) * time.Second)
-		i++
+		time.Sleep(time.Duration(2) * time.Second)
+
+		j++
 	}
+
+	errChan := make(chan error)
+	defer close(errChan)
+
+	go func() {
+		i := 0
+		for {
+			if i != 0 && i%mca.pollInterval == 0 {
+				mca.mc.Collect()
+				sl.Debugw("metrics collected")
+			}
+
+			if i != 0 && i%mca.reportInterval == 0 {
+				if err := mca.repo.StoreMetrics(mca.mc, c); err != nil {
+					sl.Errorw("internal error", alogger.ZError(err))
+					errChan <- err
+					return
+				}
+
+				sl.Debugw("metrics successfuly reported")
+
+				mca.mc.Clear()
+				i = 0
+			}
+
+			time.Sleep(time.Duration(sleepTime) * time.Second)
+			i++
+		}
+	}()
+
+	for err := range errChan {
+		return err
+	}
+
+	return nil
 }

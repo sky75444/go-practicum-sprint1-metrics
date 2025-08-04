@@ -8,4 +8,6 @@ import (
 type MetricRepo interface {
 	StoreGaugeMetrics(m model.MetricCollection, c *resty.Client) error
 	StoreCounterMetrics(m model.MetricCollection, c *resty.Client) error
+	StoreMetrics(m model.MetricCollection, c *resty.Client) error
+	ServerHealthCheck(c *resty.Client) (bool, error)
 }
