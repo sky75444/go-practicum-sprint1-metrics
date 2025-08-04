@@ -1,6 +1,7 @@
 package metricstorage
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -144,9 +145,14 @@ func createUpdateReqWithBody(serverAddr string, body model.Metrics, c *resty.Cli
 
 	req := c.R()
 	req.Method = http.MethodPost
-	req.Header.Add("Content-Type", "application/json")
+	req.SetHeader("Content-Type", "application/json")
 	req.URL = metricStorageURL
-	req.SetBody(&body)
+
+	reqBody, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	req.SetBody(&reqBody)
 
 	return req, nil
 }
