@@ -81,7 +81,6 @@ func (gh *GetHandler) GetAll() http.HandlerFunc {
 		}
 
 		sl.Debugw("generated all metrics list")
-		w.Header().Set("Content-Type", "text/html")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(metricsList))
 	})
