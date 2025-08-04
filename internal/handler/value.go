@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"strings"
@@ -31,11 +32,25 @@ func (u *ValueHandler) ValueHandle() http.HandlerFunc {
 			return
 		}
 
-		var m models.Metrics
+		//var m models.Metrics
 
-		dec := json.NewDecoder(r.Body)
-		if err := dec.Decode(&m); err != nil {
-			sl.Errorw("cannot decode request JSON body", logger.ZError(err))
+		//dec := json.NewDecoder(r.Body)
+		//if err := dec.Decode(&m); err != nil {
+		//	sl.Errorw("cannot decode request JSON body", logger.ZError(err))
+		//	http.Error(w, "internal server error", http.StatusInternalServerError)
+		//	return
+		//}
+
+		var m models.Metrics
+		var buf bytes.Buffer
+		if _, err := buf.ReadFrom(r.Body); err != nil {
+			sl.Errorw("unmarshall error", logger.ZError(err))
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		if err := json.Unmarshal(buf.Bytes(), &m); err != nil {
+			sl.Errorw("unmarshall error", logger.ZError(err))
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
 		}

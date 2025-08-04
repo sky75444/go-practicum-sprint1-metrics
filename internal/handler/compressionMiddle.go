@@ -96,6 +96,7 @@ func gzipMiddleware(h http.HandlerFunc) http.HandlerFunc {
 				http.Error(w, "compress writer create error", http.StatusInternalServerError)
 				return
 			}
+
 			r.Body = cr
 			defer cr.Close()
 		}
