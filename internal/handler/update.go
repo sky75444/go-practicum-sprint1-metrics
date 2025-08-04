@@ -65,7 +65,7 @@ func (u *UpdateHandler) UpdateHandle() http.HandlerFunc {
 		}
 
 		fmt.Println("q6")
-		w.Header().Set("Content-Type", "application/json")
+		// w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Metric updated"))
 	})
