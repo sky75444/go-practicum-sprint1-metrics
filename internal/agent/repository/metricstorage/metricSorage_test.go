@@ -1,6 +1,7 @@
 package metricstorage
 
 import (
+	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -10,10 +11,17 @@ import (
 )
 
 func TestCreateReq(t *testing.T) {
+	type body struct {
+		ID    string
+		MType string
+		Delta int64
+		Value float64
+	}
 	type want struct {
 		reqMethod   string
 		reqURL      string
 		contentType string
+		body        body
 	}
 	tests := []struct {
 		name          string
@@ -28,8 +36,14 @@ func TestCreateReq(t *testing.T) {
 			},
 			want: want{
 				reqMethod:   http.MethodPost,
-				reqURL:      "http://localhost:8080/update/gauge/gauge1/123/",
-				contentType: "text/plain",
+				reqURL:      "http://localhost:8080/update/",
+				contentType: "application/json",
+				body: body{
+					ID:    "gauge1",
+					MType: "gauge",
+					Value: float64(123),
+					Delta: 0,
+				},
 			},
 		},
 		{
@@ -39,8 +53,14 @@ func TestCreateReq(t *testing.T) {
 			},
 			want: want{
 				reqMethod:   http.MethodPost,
-				reqURL:      "http://localhost:8080/update/counter/counter1/123/",
-				contentType: "text/plain",
+				reqURL:      "http://localhost:8080/update/",
+				contentType: "application/json",
+				body: body{
+					ID:    "counter1",
+					MType: "counter",
+					Delta: int64(123),
+					Value: 0,
+				},
 			},
 		},
 	}
@@ -50,21 +70,67 @@ func TestCreateReq(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			for k, v := range tt.memCollection.GaugeMetrics {
-				req, err := createReq(serverAddr, k, MetricGaugeStorageEndpoint, v, client)
-
+			for mn, mv := range tt.memCollection.GaugeMetrics {
+				var err error
+				req, err := createUpdateReqWithBody(serverAddr, mn, model.Gauge, mv, client)
 				assert.NoError(t, err)
+
+				b := req.Body.([]byte)
+				b, err = decompress(b)
+				assert.NoError(t, err)
+
+				var um model.Metrics
+				err = json.Unmarshal(b, &um)
+				assert.NoError(t, err)
+
+				if um.Delta == nil {
+					d := int64(0)
+					um.Delta = &d
+				}
+				if um.Value == nil {
+					d := float64(0)
+					um.Value = &d
+				}
+
 				assert.Equal(t, tt.want.reqURL, req.URL)
 				assert.Equal(t, tt.want.reqMethod, req.Method)
 				assert.Equal(t, tt.want.contentType, req.Header.Get("Content-Type"))
+				assert.Equal(t, tt.want.body.ID, um.ID)
+				assert.Equal(t, tt.want.body.MType, um.MType)
+				assert.Equal(t, tt.want.body.Delta, *um.Delta)
+				assert.Equal(t, tt.want.body.Value, *um.Value)
 			}
-			for k, v := range tt.memCollection.CountMetrics {
-				req, err := createReq(serverAddr, k, MetricCounterStorageEndpoint, v, client)
+			for mn, mv := range tt.memCollection.CountMetrics {
+				var err error
+				req, err := createUpdateReqWithBody(serverAddr, mn, model.Counter, mv, client)
+
+				assert.NoError(t, err)
+
+				b := req.Body.([]byte)
+				b, err = decompress(b)
+				assert.NoError(t, err)
+
+				var um model.Metrics
+				err = json.Unmarshal(b, &um)
+				assert.NoError(t, err)
+
+				if um.Delta == nil {
+					d := int64(0)
+					um.Delta = &d
+				}
+				if um.Value == nil {
+					d := float64(0)
+					um.Value = &d
+				}
 
 				assert.NoError(t, err)
 				assert.Equal(t, tt.want.reqURL, req.URL)
 				assert.Equal(t, tt.want.reqMethod, req.Method)
 				assert.Equal(t, tt.want.contentType, req.Header.Get("Content-Type"))
+				assert.Equal(t, tt.want.body.ID, um.ID)
+				assert.Equal(t, tt.want.body.MType, um.MType)
+				assert.Equal(t, tt.want.body.Delta, *um.Delta)
+				assert.Equal(t, tt.want.body.Value, *um.Value)
 			}
 		})
 	}

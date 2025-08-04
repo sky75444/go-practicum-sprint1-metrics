@@ -19,7 +19,7 @@ func NewChiMux(
 
 	r.Use(middleware.AllowContentType("text/plain", "application/json"))
 
-	r.Get("/", logger.WithLogging(getHander.GetAll()))
+	r.Get("/", logger.WithLogging(gzipMiddleware(getHander.GetAll())))
 	r.Post("/", logger.WithLogging(errorHandler.BadRequest))
 
 	nfh := r.NotFoundHandler()
@@ -30,7 +30,7 @@ func NewChiMux(
 	})
 
 	r.Route("/value", func(r chi.Router) {
-		r.Post("/", logger.WithLogging(valueHandler.ValueHandle()))
+		r.Post("/", logger.WithLogging(gzipMiddleware(valueHandler.ValueHandle())))
 
 		r.Route("/{metricType}/{metricName}", func(r chi.Router) {
 			r.Get("/", logger.WithLogging(getHander.GetMetric()))
@@ -38,7 +38,7 @@ func NewChiMux(
 	})
 
 	r.Route("/update", func(r chi.Router) {
-		r.Post("/", logger.WithLogging(updateHandler.UpdateHandle()))
+		r.Post("/", logger.WithLogging(gzipMiddleware(updateHandler.UpdateHandle())))
 		r.NotFound(logger.WithLogging(errorHandler.BadRequest))
 
 		r.Route("/counter", func(r chi.Router) {
