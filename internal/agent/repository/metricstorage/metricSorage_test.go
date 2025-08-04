@@ -1,6 +1,7 @@
 package metricstorage
 
 import (
+	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -74,23 +75,30 @@ func TestCreateReq(t *testing.T) {
 				req, err := createUpdateReqWithBody(serverAddr, mn, model.Gauge, mv, client)
 				assert.NoError(t, err)
 
-				m := req.Body.(model.Metrics)
-				if m.Delta == nil {
+				b := req.Body.([]byte)
+				b, err = decompress(b)
+				assert.NoError(t, err)
+
+				var um model.Metrics
+				err = json.Unmarshal(b, &um)
+				assert.NoError(t, err)
+
+				if um.Delta == nil {
 					d := int64(0)
-					m.Delta = &d
+					um.Delta = &d
 				}
-				if m.Value == nil {
+				if um.Value == nil {
 					d := float64(0)
-					m.Value = &d
+					um.Value = &d
 				}
 
 				assert.Equal(t, tt.want.reqURL, req.URL)
 				assert.Equal(t, tt.want.reqMethod, req.Method)
 				assert.Equal(t, tt.want.contentType, req.Header.Get("Content-Type"))
-				assert.Equal(t, tt.want.body.ID, m.ID)
-				assert.Equal(t, tt.want.body.MType, m.MType)
-				assert.Equal(t, tt.want.body.Delta, *m.Delta)
-				assert.Equal(t, tt.want.body.Value, *m.Value)
+				assert.Equal(t, tt.want.body.ID, um.ID)
+				assert.Equal(t, tt.want.body.MType, um.MType)
+				assert.Equal(t, tt.want.body.Delta, *um.Delta)
+				assert.Equal(t, tt.want.body.Value, *um.Value)
 			}
 			for mn, mv := range tt.memCollection.CountMetrics {
 				var err error
@@ -98,24 +106,31 @@ func TestCreateReq(t *testing.T) {
 
 				assert.NoError(t, err)
 
-				m := req.Body.(model.Metrics)
-				if m.Delta == nil {
+				b := req.Body.([]byte)
+				b, err = decompress(b)
+				assert.NoError(t, err)
+
+				var um model.Metrics
+				err = json.Unmarshal(b, &um)
+				assert.NoError(t, err)
+
+				if um.Delta == nil {
 					d := int64(0)
-					m.Delta = &d
+					um.Delta = &d
 				}
-				if m.Value == nil {
+				if um.Value == nil {
 					d := float64(0)
-					m.Value = &d
+					um.Value = &d
 				}
 
 				assert.NoError(t, err)
 				assert.Equal(t, tt.want.reqURL, req.URL)
 				assert.Equal(t, tt.want.reqMethod, req.Method)
 				assert.Equal(t, tt.want.contentType, req.Header.Get("Content-Type"))
-				assert.Equal(t, tt.want.body.ID, m.ID)
-				assert.Equal(t, tt.want.body.MType, m.MType)
-				assert.Equal(t, tt.want.body.Delta, *m.Delta)
-				assert.Equal(t, tt.want.body.Value, *m.Value)
+				assert.Equal(t, tt.want.body.ID, um.ID)
+				assert.Equal(t, tt.want.body.MType, um.MType)
+				assert.Equal(t, tt.want.body.Delta, *um.Delta)
+				assert.Equal(t, tt.want.body.Value, *um.Value)
 			}
 		})
 	}

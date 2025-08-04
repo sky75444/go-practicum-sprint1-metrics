@@ -30,6 +30,22 @@ func compress(data []byte) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
+func decompress(data []byte) ([]byte, error) {
+	r, err := gzip.NewReader(bytes.NewReader(data))
+	if err != nil {
+		return nil, fmt.Errorf("failed decompress: %v", err)
+	}
+	defer r.Close()
+
+	var b bytes.Buffer
+	_, err = b.ReadFrom(r)
+	if err != nil {
+		return nil, fmt.Errorf("failed decompress data: %v", err)
+	}
+
+	return b.Bytes(), nil
+}
+
 func send(req *resty.Request) error {
 	r, err := req.Send()
 	if err != nil {
