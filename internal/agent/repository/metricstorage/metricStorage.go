@@ -149,18 +149,12 @@ func createReq(serverAddr, memName, memTypeEndpoint string, memValue uint64, c *
 }
 
 func send(req *resty.Request) error {
-	fmt.Println(req.Method)
-	fmt.Println(req.Header.Get("Content-Type"))
-	fmt.Println(req.URL)
-
 	r, err := req.Send()
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
 	if r.StatusCode() != http.StatusOK {
-		fmt.Println(r.Status())
 		return fmt.Errorf("%s", r.Status())
 	}
 
