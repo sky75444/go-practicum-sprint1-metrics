@@ -1,7 +1,6 @@
 package metricstorage
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -76,15 +75,15 @@ func (ms *metricStorage) StoreMetrics(m model.MetricCollection, c *resty.Client)
 		d := int64(mv)
 		m.Delta = &d
 
-		fmt.Println("1")
-		reqBody, err := json.Marshal(m)
-		if err != nil {
-			fmt.Println("1e")
-			return err
-		}
+		// fmt.Println("1")
+		// reqBody, err := json.Marshal(m)
+		// if err != nil {
+		// 	fmt.Println("1e")
+		// 	return err
+		// }
 
 		fmt.Println("2")
-		req, err := createUpdateReqWithBody(ms.serverAddr, reqBody, c)
+		req, err := createUpdateReqWithBody(ms.serverAddr, m, c)
 		if err != nil {
 			fmt.Println("2e")
 			return err
@@ -93,7 +92,7 @@ func (ms *metricStorage) StoreMetrics(m model.MetricCollection, c *resty.Client)
 		fmt.Println("3")
 		if err := send(req); err != nil {
 			fmt.Println(m)
-			fmt.Println(string(reqBody))
+			// fmt.Println(string(reqBody))
 
 			fmt.Println("3e")
 			return err
@@ -108,15 +107,15 @@ func (ms *metricStorage) StoreMetrics(m model.MetricCollection, c *resty.Client)
 		d := float64(mv)
 		m.Value = &d
 
-		fmt.Println("11")
-		reqBody, err := json.Marshal(m)
-		if err != nil {
-			fmt.Println("11e")
-			return err
-		}
+		// fmt.Println("11")
+		// reqBody, err := json.Marshal(m)
+		// if err != nil {
+		// 	fmt.Println("11e")
+		// 	return err
+		// }
 
 		fmt.Println("22")
-		req, err := createUpdateReqWithBody(ms.serverAddr, reqBody, c)
+		req, err := createUpdateReqWithBody(ms.serverAddr, m, c)
 		if err != nil {
 			fmt.Println("22e")
 			return err
@@ -132,7 +131,7 @@ func (ms *metricStorage) StoreMetrics(m model.MetricCollection, c *resty.Client)
 	return nil
 }
 
-func createUpdateReqWithBody(serverAddr string, body []byte, c *resty.Client) (*resty.Request, error) {
+func createUpdateReqWithBody(serverAddr string, body model.Metrics, c *resty.Client) (*resty.Request, error) {
 	if len(serverAddr) == 5 {
 		//Если длина 5, это значит что хост не указан. А для агента важно знать хост
 		serverAddr = fmt.Sprintf("http://localhost%s", serverAddr)
@@ -147,7 +146,7 @@ func createUpdateReqWithBody(serverAddr string, body []byte, c *resty.Client) (*
 	req.Method = http.MethodPost
 	req.Header.Add("Content-Type", "application/json")
 	req.URL = metricStorageURL
-	req.Body = body
+	req.SetBody(&body)
 
 	return req, nil
 }
