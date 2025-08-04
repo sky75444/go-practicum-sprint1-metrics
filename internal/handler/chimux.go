@@ -19,7 +19,7 @@ func NewChiMux(
 
 	r.Use(middleware.AllowContentType("text/plain", "application/json"))
 
-	r.Get("/", logger.WithLogging(getHander.GetAll()))
+	r.Get("/", logger.WithLogging(gzipMiddleware(getHander.GetAll())))
 	r.Post("/", logger.WithLogging(errorHandler.BadRequest))
 
 	nfh := r.NotFoundHandler()
