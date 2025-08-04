@@ -91,13 +91,25 @@ func (ms *metricStorage) StoreMetrics(m model.MetricCollection, c *resty.Client)
 		}
 
 		fmt.Println("3")
-		if err := send(req); err != nil {
-			fmt.Println(m)
-			// fmt.Println(string(reqBody))
-
-			fmt.Println("3e")
+		res, err := req.Send()
+		if err != nil {
+			fmt.Println(err)
 			return err
 		}
+
+		if res.StatusCode() != http.StatusOK {
+			fmt.Println(res.Status())
+			return fmt.Errorf("%s", res.Status())
+		}
+
+		// fmt.Println("3")
+		// if err := send(req); err != nil {
+		// 	fmt.Println(m)
+		// 	// fmt.Println(string(reqBody))
+
+		// 	fmt.Println("3e")
+		// 	return err
+		// }
 	}
 
 	for mn, mv := range m.GaugeMetrics {
