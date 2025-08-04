@@ -23,6 +23,7 @@ func NewRouter(runAddr string, handlers *handlers) *router {
 			handlers.getHandler,
 			handlers.updateHandler,
 			handlers.valueHandler,
+			handlers.healthHandler,
 		),
 		RunAddr: runAddr,
 	}

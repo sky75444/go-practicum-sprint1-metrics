@@ -12,6 +12,7 @@ const (
 	MetricGaugeStorageEndpoint   = "update/gauge"
 	MetricCounterStorageEndpoint = "update/counter"
 	MetricStorageEndpoint        = "update/"
+	HelthEndpoint                = "health/"
 )
 
 type metricStorage struct {
@@ -207,4 +208,31 @@ func send(req *resty.Request) error {
 	}
 
 	return nil
+}
+
+func (ms *metricStorage) ServerHealthCheck(c *resty.Client) (bool, error) {
+	if len(ms.serverAddr) == 5 {
+		//Если длина 5, это значит что хост не указан. А для агента важно знать хост
+		ms.serverAddr = fmt.Sprintf("http://localhost%s", ms.serverAddr)
+	}
+
+	HelthEndpointURL := fmt.Sprintf("%s/%s", ms.serverAddr, HelthEndpoint)
+	if HelthEndpointURL[:4] != "http" {
+		HelthEndpointURL = fmt.Sprintf("http://%s", HelthEndpointURL)
+	}
+
+	req := c.R()
+	req.Method = http.MethodGet
+	req.URL = HelthEndpointURL
+
+	r, err := req.Send()
+	if err != nil {
+		return false, err
+	}
+
+	if r.StatusCode() != http.StatusOK {
+		return false, fmt.Errorf("%s", r.Status())
+	}
+
+	return true, nil
 }

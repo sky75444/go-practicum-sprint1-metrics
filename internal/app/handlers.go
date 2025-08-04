@@ -11,6 +11,7 @@ type handlers struct {
 	getHandler     *handler.GetHandler
 	updateHandler  *handler.UpdateHandler
 	valueHandler   *handler.ValueHandler
+	healthHandler  *handler.HealthHandler
 }
 
 func NewHandlers(services *services) *handlers {
@@ -21,5 +22,6 @@ func NewHandlers(services *services) *handlers {
 		getHandler:     handler.NewGetHandler(services.UpdateMetricsService),
 		updateHandler:  handler.NewUpdateHandler(services.UpdateMetricsService),
 		valueHandler:   handler.NewValueHandler(services.UpdateMetricsService),
+		healthHandler:  handler.NewHealthHandler(),
 	}
 }

@@ -1,6 +1,7 @@
 package metriccollectoragent
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -36,26 +37,57 @@ func (mca *metricCollectorAgent) EndlessCollectMetrics(c *resty.Client) error {
 	defer alogger.AZLog.Sync()
 	sl := alogger.AZLog.Sugar()
 
-	i := 0
+	j := 0
 	for {
-		if i != 0 && i%mca.pollInterval == 0 {
-			mca.mc.Collect()
-			sl.Debugw("metrics collected")
+
+		if j == 10 {
+			sl.Errorw("internal error", alogger.ZError(fmt.Errorf("server not allowed")))
+			return fmt.Errorf("server not allowed")
 		}
 
-		if i != 0 && i%mca.reportInterval == 0 {
-			if err := mca.repo.StoreMetrics(mca.mc, c); err != nil {
-				sl.Errorw("internal error", alogger.ZError(err))
-				return err
+		sl.Infow("health checking server")
+		if ok, _ := mca.repo.ServerHealthCheck(c); ok {
+			sl.Infow("server is healthy")
+			break
+		}
+
+		time.Sleep(time.Duration(2) * time.Second)
+
+		j++
+	}
+
+	errChan := make(chan error)
+	defer close(errChan)
+
+	go func() {
+		i := 0
+		for {
+			if i != 0 && i%mca.pollInterval == 0 {
+				mca.mc.Collect()
+				sl.Debugw("metrics collected")
 			}
 
-			sl.Debugw("metrics successfuly reported")
+			if i != 0 && i%mca.reportInterval == 0 {
+				if err := mca.repo.StoreMetrics(mca.mc, c); err != nil {
+					sl.Errorw("internal error", alogger.ZError(err))
+					errChan <- err
+					return
+				}
 
-			mca.mc.Clear()
-			i = 0
+				sl.Debugw("metrics successfuly reported")
+
+				mca.mc.Clear()
+				i = 0
+			}
+
+			time.Sleep(time.Duration(sleepTime) * time.Second)
+			i++
 		}
+	}()
 
-		time.Sleep(time.Duration(sleepTime) * time.Second)
-		i++
+	for err := range errChan {
+		return err
 	}
+
+	return nil
 }

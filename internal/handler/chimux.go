@@ -13,6 +13,7 @@ func NewChiMux(
 	getHander *GetHandler,
 	updateHandler *UpdateHandler,
 	valueHandler *ValueHandler,
+	healthHandler *HealthHandler,
 ) *chi.Mux {
 	r := chi.NewRouter()
 
@@ -22,6 +23,11 @@ func NewChiMux(
 	r.Post("/", logger.WithLogging(errorHandler.BadRequest))
 
 	nfh := r.NotFoundHandler()
+
+	r.Route("/health", func(r chi.Router) {
+		r.Get("/", logger.WithLogging(healthHandler.HealthCheck()))
+		r.Post("/", logger.WithLogging(healthHandler.HealthCheck()))
+	})
 
 	r.Route("/value", func(r chi.Router) {
 		r.Post("/", logger.WithLogging(valueHandler.ValueHandle()))
