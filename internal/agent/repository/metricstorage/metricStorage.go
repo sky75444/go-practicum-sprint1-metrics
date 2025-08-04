@@ -1,7 +1,7 @@
 package metricstorage
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 
 	"github.com/go-resty/resty/v2"
@@ -72,8 +72,8 @@ func createUpdateReqWithBody(
 
 	m.ID = metricName
 
-	switch {
-	case metricType == model.Gauge:
+	switch metricType {
+	case model.Gauge:
 		m.MType = model.Gauge
 		d := float64(metricVal)
 		m.Value = &d
@@ -85,37 +85,22 @@ func createUpdateReqWithBody(
 
 	req := c.R()
 	req.Method = http.MethodPost
-	req.SetHeader("Content-Type", "application/json")
 	req.URL = craftURL(serverAddr, MetricStorageEndpoint)
-	// req.SetBody(m)
-	req.Body = m
+
+	bodyBytes, err := json.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+
+	b, err := compress(bodyBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	req.SetHeader("Content-Type", "application/json")
+	req.SetHeader("Accept-Encoding", "gzip")
+	req.SetHeader("Content-Encoding", "gzip")
+	req.Body = b
 
 	return req, nil
-}
-
-func send(req *resty.Request) error {
-	r, err := req.Send()
-	if err != nil {
-		return err
-	}
-
-	if r.StatusCode() != http.StatusOK {
-		return fmt.Errorf("%s", r.Status())
-	}
-
-	return nil
-}
-
-func craftURL(srvAddr, edpoint string) string {
-	if len(srvAddr) == 5 {
-		//Если длина 5, это значит что хост не указан. А для агента важно знать хост
-		srvAddr = fmt.Sprintf("http://localhost%s", srvAddr)
-	}
-
-	edpointPath := fmt.Sprintf("%s/%s", srvAddr, edpoint)
-	if edpointPath[:4] != "http" {
-		edpointPath = fmt.Sprintf("http://%s", edpointPath)
-	}
-
-	return edpointPath
 }
