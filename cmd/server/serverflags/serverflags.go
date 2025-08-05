@@ -54,11 +54,11 @@ func NewParsedFlags() *flags {
 		flags.fileName = ef.FileStoragePath
 	}
 
-	if ef.Restore {
+	if ef.Restore || !ef.Restore {
 		flags.restoreFileData = ef.Restore
 	}
 
-	if ef.StoreInterval > 0 {
+	if ef.StoreInterval >= 0 {
 		flags.storeInterval = ef.StoreInterval
 	}
 
