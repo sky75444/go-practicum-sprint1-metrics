@@ -161,13 +161,13 @@ func (m *memStorage) SaveDataToFile() error {
 		return err
 	}
 
-	formattedJ := formatJsonString(jData)
+	formattedJ := formatJString(jData)
 	os.WriteFile(m.fname, []byte(formattedJ), 0666)
 
 	return nil
 }
 
-func formatJsonString(jsonData []byte) []byte {
+func formatJString(jsonData []byte) []byte {
 	jString := string(jsonData)
 	jString = strings.ReplaceAll(jString, "},{", "},\n{") // добавляем перенос строки между объектами
 	jString = strings.ReplaceAll(jString, "{", "\t{")     // добавляем табуляцию строки перед объектом
