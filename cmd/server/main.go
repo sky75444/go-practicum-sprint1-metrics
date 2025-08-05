@@ -9,7 +9,13 @@ import (
 
 func main() {
 	f := serverflags.NewParsedFlags()
-	c := serverconfig.NewConfig(f.GetRunAddr(), f.GetLogLevel())
+	c := serverconfig.NewConfig(
+		f.GetRunAddr(),
+		f.GetLogLevel(),
+		f.GetFileName(),
+		f.GetRestore(),
+		f.GetStoreInterval(),
+	)
 
 	di := app.NewDI()
 	di.Init(c)
@@ -18,5 +24,17 @@ func main() {
 		panic(err)
 	}
 
-	di.Router.Start()
+	defer logger.ZLog.Sync()
+	sl := logger.ZLog.Sugar()
+
+	sl.Infow(
+		"Starting parametrs",
+		"server addr", c.RunAddr,
+		"logger mode", c.LogLevel,
+		"need restore", c.RestoreFileData,
+		"store interval", c.StoreInterval,
+		"save file dir", c.FileName,
+	)
+
+	di.Start()
 }

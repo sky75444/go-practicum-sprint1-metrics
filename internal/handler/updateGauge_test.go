@@ -57,11 +57,22 @@ func TestGaugeHandle(t *testing.T) {
 		},
 	}
 
-	cu := NewUpdateCounterHandler(updatemetrics.NewUpdateMetrics(memstorage.NewMemStorage()))
-	gu := NewUpdateGaugeHandler(updatemetrics.NewUpdateMetrics(memstorage.NewMemStorage()))
-	gh := NewGetHandler(updatemetrics.NewUpdateMetrics(memstorage.NewMemStorage()))
-	uh := NewUpdateHandler(updatemetrics.NewUpdateMetrics(memstorage.NewMemStorage()))
-	vh := NewValueHandler(updatemetrics.NewUpdateMetrics(memstorage.NewMemStorage()))
+	needRestore := false
+	fname := "./savedData.json"
+	storeInterval := 10
+
+	mem, err := memstorage.NewMemStorage(fname, needRestore, storeInterval)
+	if err != nil {
+		panic(err)
+	}
+
+	um := updatemetrics.NewUpdateMetrics(mem)
+
+	cu := NewUpdateCounterHandler(um)
+	gu := NewUpdateGaugeHandler(um)
+	gh := NewGetHandler(um)
+	uh := NewUpdateHandler(um)
+	vh := NewValueHandler(um)
 	hh := NewHealthHandler()
 	eh := NewErrorHandler()
 

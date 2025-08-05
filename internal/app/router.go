@@ -11,11 +11,12 @@ import (
 
 type router struct {
 	R       chi.Router
+	Srv     *http.Server
 	RunAddr string
 }
 
 func NewRouter(runAddr string, handlers *handlers) *router {
-	return &router{
+	r := router{
 		R: handler.NewChiMux(
 			handlers.errorHandler,
 			handlers.counterHandler,
@@ -27,18 +28,20 @@ func NewRouter(runAddr string, handlers *handlers) *router {
 		),
 		RunAddr: runAddr,
 	}
+
+	r.Srv = &http.Server{
+		Addr:    r.RunAddr,
+		Handler: r.R,
+	}
+
+	return &r
 }
 
 func (r *router) Start() {
 	defer logger.ZLog.Sync()
 	sl := logger.ZLog.Sugar()
 
-	sl.Infow(
-		"Starting server",
-		"addr", r.RunAddr,
-	)
-
-	if err := http.ListenAndServe(r.RunAddr, r.R); err != nil {
+	if err := r.Srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		sl.Fatalw(err.Error(), "event", "start server")
 	}
 }
