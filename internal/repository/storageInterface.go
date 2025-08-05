@@ -1,5 +1,7 @@
 package repository
 
+import "context"
+
 type MemStorage interface {
 	UpdateGauge(name string, value float64) error
 	UpdateCounter(name string, value int64) error
@@ -7,6 +9,6 @@ type MemStorage interface {
 	GetCounter(name string) (int64, error)
 	GetAll() (string, error)
 	// StoreMetricsToFile(errChan chan error)
-	StoreMetricsToFile() error
+	StoreMetricsToFile(ctx context.Context) error
 	SaveDataToFile() error
 }

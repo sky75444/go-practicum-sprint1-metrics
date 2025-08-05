@@ -1,6 +1,7 @@
 package memstorage
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -122,7 +123,7 @@ func (m *memStorage) GetAll() (string, error) {
 	return strings.Join(metrics, "\n"), nil
 }
 
-func (m *memStorage) StoreMetricsToFile() error {
+func (m *memStorage) StoreMetricsToFile(ctx context.Context) error {
 	if m.storeInterval == 0 {
 		return nil
 	}
@@ -133,21 +134,25 @@ func (m *memStorage) StoreMetricsToFile() error {
 	defer m.SaveDataToFile()
 
 	i := 0
-	for i <= m.storeInterval {
-		if i == m.storeInterval {
-			if err := m.SaveDataToFile(); err != nil {
-				return err
+	for {
+
+		select {
+		case <-ctx.Done():
+			return nil
+		default:
+			if i == m.storeInterval {
+				if err := m.SaveDataToFile(); err != nil {
+					return err
+				}
+
+				sl.Debugw("metrics stored to file")
+				i = 0
 			}
 
-			sl.Debugw("metrics ctored to file")
-			i = 0
+			time.Sleep(time.Duration(1) * time.Second)
+			i++
 		}
-
-		time.Sleep(time.Duration(1) * time.Second)
-		i++
 	}
-
-	return nil
 }
 
 func (m *memStorage) SaveDataToFile() error {

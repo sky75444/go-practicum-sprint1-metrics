@@ -1,6 +1,7 @@
 package updatemetrics
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/repository"
@@ -67,8 +68,8 @@ func (u *updateMetrics) GetAll() (string, error) {
 	return metrics, nil
 }
 
-func (u *updateMetrics) EndlessStoreMetricsToFile() error {
-	return u.repo.StoreMetricsToFile()
+func (u *updateMetrics) EndlessStoreMetricsToFile(ctx context.Context) error {
+	return u.repo.StoreMetricsToFile(ctx)
 }
 
 func (u *updateMetrics) SaveDataToFile() error {
