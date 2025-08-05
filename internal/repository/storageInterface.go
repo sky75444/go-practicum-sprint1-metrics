@@ -6,4 +6,7 @@ type MemStorage interface {
 	GetGauge(name string) (float64, error)
 	GetCounter(name string) (int64, error)
 	GetAll() (string, error)
+	// StoreMetricsToFile(errChan chan error)
+	StoreMetricsToFile() error
+	SaveDataToFile() error
 }

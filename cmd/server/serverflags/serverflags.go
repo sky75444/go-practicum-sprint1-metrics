@@ -3,23 +3,42 @@ package serverflags
 import (
 	"flag"
 	"log"
+	"os"
+	"path/filepath"
 
 	"github.com/caarlos0/env"
 )
 
 type flags struct {
-	runAddr      string
-	flagLogLevel string
+	restoreFileData bool
+	runAddr         string
+	flagLogLevel    string
+	fileName        string
+	storeInterval   int
 }
 
 type envFlags struct {
-	Address string `env:"ADDRESS"`
+	restore         bool   `env:"RESTORE"`
+	Address         string `env:"ADDRESS"`
+	fileStoragePath string `env:"FILE_STORAGE_PATH"`
+	storeInterval   int    `env:"STORE_INTERVAL"`
 }
 
 func NewParsedFlags() *flags {
 	flags := flags{}
 	flag.StringVar(&flags.runAddr, "a", ":8080", "address and port to run server")
 	flag.StringVar(&flags.flagLogLevel, "l", "info", "log level")
+
+	currentDir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	filepath := filepath.Join(currentDir, "savedMetricsData.json")
+
+	flag.BoolVar(&flags.restoreFileData, "r", true, "restore saved data from file")
+	flag.StringVar(&flags.fileName, "f", filepath, "save file dir")
+	flag.IntVar(&flags.storeInterval, "i", 300, "interval of storing metric data to file")
+
 	flag.Parse()
 
 	var ef envFlags
@@ -31,6 +50,18 @@ func NewParsedFlags() *flags {
 		flags.runAddr = ef.Address
 	}
 
+	if ef.fileStoragePath != "" {
+		flags.fileName = ef.fileStoragePath
+	}
+
+	if ef.restore {
+		flags.restoreFileData = ef.restore
+	}
+
+	if ef.storeInterval > 0 {
+		flags.storeInterval = ef.storeInterval
+	}
+
 	return &flags
 }
 
@@ -40,4 +71,16 @@ func (f *flags) GetRunAddr() string {
 
 func (f *flags) GetLogLevel() string {
 	return f.flagLogLevel
+}
+
+func (f *flags) GetFileName() string {
+	return f.fileName
+}
+
+func (f *flags) GetRestore() bool {
+	return f.restoreFileData
+}
+
+func (f *flags) GetStoreInterval() int {
+	return f.storeInterval
 }

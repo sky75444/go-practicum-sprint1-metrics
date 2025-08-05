@@ -33,11 +33,6 @@ func (r *router) Start() {
 	defer logger.ZLog.Sync()
 	sl := logger.ZLog.Sugar()
 
-	sl.Infow(
-		"Starting server",
-		"addr", r.RunAddr,
-	)
-
 	if err := http.ListenAndServe(r.RunAddr, r.R); err != nil {
 		sl.Fatalw(err.Error(), "event", "start server")
 	}

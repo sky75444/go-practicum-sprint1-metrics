@@ -66,3 +66,11 @@ func (u *updateMetrics) GetAll() (string, error) {
 
 	return metrics, nil
 }
+
+func (u *updateMetrics) EndlessStoreMetricsToFile() error {
+	return u.repo.StoreMetricsToFile()
+}
+
+func (u *updateMetrics) SaveDataToFile() error {
+	return u.repo.SaveDataToFile()
+}
