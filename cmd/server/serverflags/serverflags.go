@@ -18,10 +18,10 @@ type flags struct {
 }
 
 type envFlags struct {
-	restore         bool   `env:"RESTORE"`
+	Restore         bool   `env:"RESTORE"`
 	Address         string `env:"ADDRESS"`
-	fileStoragePath string `env:"FILE_STORAGE_PATH"`
-	storeInterval   int    `env:"STORE_INTERVAL"`
+	FileStoragePath string `env:"FILE_STORAGE_PATH"`
+	StoreInterval   int    `env:"STORE_INTERVAL"`
 }
 
 func NewParsedFlags() *flags {
@@ -50,16 +50,16 @@ func NewParsedFlags() *flags {
 		flags.runAddr = ef.Address
 	}
 
-	if ef.fileStoragePath != "" {
-		flags.fileName = ef.fileStoragePath
+	if ef.FileStoragePath != "" {
+		flags.fileName = ef.FileStoragePath
 	}
 
-	if ef.restore {
-		flags.restoreFileData = ef.restore
+	if ef.Restore {
+		flags.restoreFileData = ef.Restore
 	}
 
-	if ef.storeInterval > 0 {
-		flags.storeInterval = ef.storeInterval
+	if ef.StoreInterval > 0 {
+		flags.storeInterval = ef.StoreInterval
 	}
 
 	return &flags
