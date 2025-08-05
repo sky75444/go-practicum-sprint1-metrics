@@ -14,59 +14,20 @@ import (
 	"github.com/sky75444/go-practicum-sprint1-metrics/internal/models"
 )
 
-type Producer struct {
-	file *os.File // файл для записи
-}
-
-type Consumer struct {
-	file *os.File // файл для чтения
-}
-
-func NewProducer(filename string) (*Producer, error) {
-	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Producer{file: file}, nil
-}
-
-func NewConsumer(filename string) (*Consumer, error) {
-	file, err := os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0666)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Consumer{file: file}, nil
-}
-
 type memStorage struct {
 	mu            sync.RWMutex
 	gauges        map[string]float64
 	counters      map[string]int64
 	fname         string
 	storeInterval int
-	c             *Consumer
-	p             *Producer
 }
 
 func NewMemStorage(fname string, needRestore bool, storeInterval int) (*memStorage, error) {
-	p, err := NewProducer(fname)
-	if err != nil {
-		return nil, err
-	}
-	c, err := NewConsumer(fname)
-	if err != nil {
-		return nil, err
-	}
-
 	mem := memStorage{
 		gauges:        make(map[string]float64),
 		counters:      make(map[string]int64),
 		fname:         fname,
 		storeInterval: storeInterval,
-		c:             c,
-		p:             p,
 	}
 
 	if !needRestore {
@@ -167,7 +128,6 @@ func (m *memStorage) StoreMetricsToFile(ctx context.Context) error {
 		return nil
 	}
 
-	defer m.p.file.Close()
 	defer logger.ZLog.Sync()
 	sl := logger.ZLog.Sugar()
 
@@ -196,18 +156,24 @@ func (m *memStorage) StoreMetricsToFile(ctx context.Context) error {
 }
 
 func (m *memStorage) SaveDataToFile() error {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	if _, err := os.Stat(m.fname); os.IsNotExist(err) {
+		file, err := os.Create(m.fname)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+	}
+
 	jData, err := json.Marshal(m.convertToModelMetrics())
 	if err != nil {
 		return err
 	}
-
 	formattedJ := formatJString(jData)
 
-	if _, err := m.p.file.Write(formattedJ); err != nil {
-		return err
-	}
-
-	return nil
+	return os.WriteFile(m.fname, formattedJ, 0666)
 }
 
 func formatJString(jsonData []byte) []byte {
@@ -244,9 +210,18 @@ func (m *memStorage) convertToModelMetrics() []models.Metrics {
 }
 
 func (m *memStorage) loadMetricsFromFile() (*[]models.Metrics, error) {
-	defer m.c.file.Close()
-	var data []byte
-	_, err := m.c.file.Read(data)
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	if _, err := os.Stat(m.fname); os.IsNotExist(err) {
+		file, err := os.Create(m.fname)
+		if err != nil {
+			return nil, err
+		}
+		defer file.Close()
+	}
+
+	data, err := os.ReadFile(m.fname)
 	if err != nil {
 		return nil, err
 	}
